@@ -1,3 +1,4 @@
+
 const weatherToday = document.querySelector(".weather-today")
 const weatherData = document.querySelector(".weather-data")
 const todayEl = document.querySelector(".today-el")
