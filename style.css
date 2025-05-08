@@ -22,7 +22,7 @@ body{
     border-radius: 5px;
     padding:2px;
 }
-.inputSearch{
+.input-search{
     margin:0 0.2em;
     padding:0.22em;
     font-size: 1rem;
@@ -32,7 +32,7 @@ body{
     border-radius: 2px;
 }
 
-.weather-search{
+.weather-search-btn{
     border:none;
     color:white;
     background-color: #3a56c9;
@@ -78,6 +78,9 @@ body{
     font-size: 1.2rem;
 }
 
+.weather-today-p{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 .img-unsplash{
     position: absolute;
     top:2px;
@@ -120,10 +123,10 @@ body{
     align-items: center;
 } 
 
-.weekly-data p {
+.weekly-data p{
     margin: 8px 0;
     font-size: 1rem;
-    color: #555;
+    color: #121111;
 }
 
 .weekly-data img {
@@ -138,10 +141,11 @@ body{
     text-align: center;
     transition: transform 0.2s ease;
 }
-
+.weekly-data div:hover{
+    background-color: #d4dcfe;
+}
 .weekly-data div:hover,.today-highlights div:hover{
     transform: translateY(-5px);
-    background-color: rgb(132, 251, 243);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
@@ -164,24 +168,21 @@ body{
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-
 .today-wind{
     font-size: 1.3rem;
 }
+
 .today-wind p,.sun-data p,.today-humidity p,.today-visibility p,.today-rain p,.today-uv-index p{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 1.32rem;
 }
 
+.error-search-div{
+    font-size: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 
-
-
-
-
-
-
-
-
-  
-      
