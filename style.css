@@ -79,6 +79,7 @@ body{
 .today-el{
     display:flex;
     align-items: center;
+    margin-bottom: 0.4em;
 }
 
 .today-el .weather-today-p{
