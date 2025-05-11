@@ -22,8 +22,12 @@ let locationErrorEl = document.createElement("div")
 function locationError(){
     weatherToday.style.display="none";
     mainContainer.style.display="none";
+    if(errorDiv.children.length){
+        errorDiv.style.display = 'none'
+    }
     if(locationErrorEl.children.length){
         console.log('Location Error');
+        locationErrorEl.style.display = 'flex';
     }
     else{
         locationErrorEl.style.display = 'flex';
