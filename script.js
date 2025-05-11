@@ -210,7 +210,20 @@ navigator.geolocation.getCurrentPosition((position)=>{
     }).catch((error)=>{
         errorFunction();
     })
-})
+},
+  (error) => {
+    if (error.code === error.PERMISSION_DENIED) {
+      alert("Location access is needed for weather info. Please enable location.");
+      errorFunction();
+    } else if (error.code === error.POSITION_UNAVAILABLE) {
+      alert("Location is unavailable. Please turn on your device's location services.");
+      errorFunction();
+    } else {
+      alert("An error occurred: " + error.message);
+      errorFunction();
+    }
+  }
+)
 
 //function-render
 function renderData(locationName){
