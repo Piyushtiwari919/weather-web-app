@@ -17,6 +17,7 @@ body{
     display: inline-block;
     margin:0.2em;
     margin-bottom: 1em;
+    background-color: #CEEDDB;
     border: 2px solid #5a5959;
     border-radius: 5px;
     padding:2px;
@@ -24,6 +25,7 @@ body{
 .input-search{
     margin:0 0.2em;
     padding:0.22em;
+    background-color: #CEEDDB;
     font-size: 1rem;
     border: none;
     outline: none;
@@ -33,7 +35,8 @@ body{
 
 .weather-search-btn{
     border:none;
-    color:white;
+    color:white; 
+     /*background-color: #CEEDDB; */
     background-color: #3a56c9;
     border-radius: 5px;
     padding:0.2em;
