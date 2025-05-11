@@ -68,7 +68,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
         let imgData = document.createElement("div");
         imgData.className = "img-data";
         let imgEl = document.createElement("img");
-        imgEl.setAttribute("src",`http://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
+        imgEl.setAttribute("src",`https://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
         imgData.appendChild(imgEl);
         //temp-data
         let tempData = document.createElement("p");
