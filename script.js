@@ -44,6 +44,7 @@ function errorFunction(){
     mainContainer.style.display="none";
     if(errorDiv.children.length){
         console.log("try searching new location");
+        errorDiv.style.display = "flex";
     }
     else{
         errorDiv.style.display = "flex";
