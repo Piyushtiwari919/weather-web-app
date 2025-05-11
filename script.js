@@ -238,13 +238,13 @@ navigator.geolocation.getCurrentPosition((position)=>{
   (error) => {
     if (error.code === error.PERMISSION_DENIED) {
       alert("Location access is needed for weather info. Please enable location.");
-      errorFunction();
+      locationError();
     } else if (error.code === error.POSITION_UNAVAILABLE) {
       alert("Location is unavailable. Please turn on your device's location services.");
-      errorFunction();
+      locationError();
     } else {
       alert("An error occurred: " + error.message);
-      errorFunction();
+      locationError();
     }
   }
 )
