@@ -17,6 +17,7 @@ const visibilityParentEl = document.querySelector(".today-visibility")
 const rainParentEl = document.querySelector(".today-rain")
 const uvIndexParentEl = document.querySelector(".today-uv-index")
 let errorDiv = document.createElement("div")
+let locationErrorEl = document.createElement("div")
 
 function locationError(){
     weatherToday.style.display="none";
