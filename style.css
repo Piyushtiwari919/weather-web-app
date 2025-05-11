@@ -185,6 +185,15 @@ body{
     font-size: 1.32rem;
 }
 
+.location-error{
+    font-size: 1.8rem;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .error-search-div{
     font-size: 2rem;
     display: flex;
