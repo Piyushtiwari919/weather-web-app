@@ -22,20 +22,21 @@ let locationErrorEl = document.createElement("div")
 function locationError(){
     weatherToday.style.display="none";
     mainContainer.style.display="none";
-    if(errorDiv.children.length){
-        errorDiv.style.display = 'none'
+    if (errorDiv.children.length) {
+    errorDiv.style.display = 'none';
     }
-    if(locationErrorEl.children.length){
+    if (locationErrorEl.children.length) {
         console.log('Location Error');
         locationErrorEl.style.display = 'flex';
-    }
-    else{
+    } else {
         locationErrorEl.style.display = 'flex';
-        locationErrorEl.className = 'location-error'
-        let errorEl = document.createElement("p")
-        errorEl.appendChild(document.createElement(`We couldn't access your location. Make sure location services are turned ON in your phone's settings, then reload the page.`))
-        locationErrorEl.appendChild(errorEl)
-        document.body.appendChild(locationErrorEl)
+        locationErrorEl.className = 'location-error';
+
+        let errorEl = document.createElement("p");
+        errorEl.textContent = "We couldn't access your location. Make sure location services are turned ON in your phone's settings, then reload the page.";
+
+        locationErrorEl.appendChild(errorEl);
+        document.body.appendChild(locationErrorEl);
     }
 }
 
