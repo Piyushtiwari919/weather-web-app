@@ -1,4 +1,5 @@
 
+//Start
 const weatherToday = document.querySelector(".weather-today")
 const weatherData = document.querySelector(".weather-data")
 const todayEl = document.querySelector(".today-el")
@@ -15,33 +16,35 @@ const humidityParentEl = document.querySelector(".today-humidity")
 const visibilityParentEl = document.querySelector(".today-visibility")
 const rainParentEl = document.querySelector(".today-rain")
 const uvIndexParentEl = document.querySelector(".today-uv-index")
-let mainData = 0
-let imageData = 0
+let errorDiv = document.createElement("div")
 
 function errorFunction(){
     weatherToday.style.display="none";
     mainContainer.style.display="none";
-    todayDataH2.style.display = "none";
-    let errorDiv = document.createElement("div")
-    errorDiv.className = "error-search-div"
-    let errorEl1 = document.createElement("p")
-    let errorEl2 = document.createElement("p")
-    errorEl1.appendChild(document.createTextNode("Soory! "))
-    errorEl1.appendChild(document.createTextNode("No Data Available"))
-    errorDiv.appendChild(errorEl1)
-    errorDiv.appendChild(errorEl2)
-    document.body.appendChild(errorDiv);
-}
+    if(errorDiv.children.length){
+        console.log("try searching new location");
+    }
+    else{
+        errorDiv.style.display = "flex";
+        errorDiv.className = "error-search-div"
+        let errorEl1 = document.createElement("p")
+        let errorEl2 = document.createElement("p")
+        errorEl1.appendChild(document.createTextNode("Sorry! No Data Available"))
+        errorEl2.appendChild(document.createTextNode(`Try searching different location`))
+        errorDiv.appendChild(errorEl1)
+        errorDiv.appendChild(errorEl2)
+        document.body.appendChild(errorDiv);
+    }
+};
 fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature").then((res)=>{
     if(!res.ok){
         throw new Error("Failed to load Image");
     }
     return res.json()
 }).then((data)=>{
-    imageData = data
     let imgUnsplash = document.createElement("img")
-    if(imageData){
-        imgUnsplash.setAttribute("src",`${imageData["urls"]["full"]}`)
+    if(data){
+        imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`)
     }
     else{
         imgUnsplash.setAttribute("src",'https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDQ2MTkyMDh8&ixlib=rb-4.0.3&q=85')
@@ -53,27 +56,28 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
 })
 
 navigator.geolocation.getCurrentPosition((position)=>{
-    // console.log(position);
-    fetch(`https://apis.scrimba.com/openweathermap/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&units=metric`)
+    console.log(position);
+    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7`)
     .then((res)=>{
         if(!res.ok){
-            throw new Error("Location Data Not Available")
+            throw new Error("This location data is not availbale")
         }
-        return res.json();
+        return res.json()
     }).then((data)=>{
-        // console.log(data);
-        mainData = data;
-        //weather-data
-        //img-data
+        console.log(data);
+        //For-Allocation
+        weatherToday.style.display="flex";
+        mainContainer.style.display="block";
+        //image-element
         let imgData = document.createElement("div");
         imgData.className = "img-data";
         let imgEl = document.createElement("img");
-        imgEl.setAttribute("src",`https://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
+        imgEl.setAttribute("src",`${data["current"]["condition"]["icon"]}`);
         imgData.appendChild(imgEl);
         //temp-data
         let tempData = document.createElement("p");
         tempData.className = "temp-data";
-        let tempToday = Math.floor(data["main"]["temp"]);
+        let tempToday = Math.floor(data["current"]["temp_c"]);
         tempData.appendChild(document.createTextNode(`${tempToday}°C`));
         //date-data
         let date = new Date();
@@ -89,31 +93,20 @@ navigator.geolocation.getCurrentPosition((position)=>{
         weatherData.appendChild(imgData);
         weatherData.appendChild(tempData);
         weatherData.appendChild(dateEl);
-        
+
         //today-el
         let imgWeather = document.createElement("img");
-        imgWeather.setAttribute("src",`https://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
+        imgWeather.setAttribute("src",`${data["current"]["condition"]["icon"]}`);
         let weatherTodayEl = document.createElement("p");
         weatherTodayEl.className = "weather-today-p";
-        weatherTodayEl.appendChild(document.createTextNode(`${data["weather"][0]["main"]}`));
-        todayEl.appendChild(imgWeather)
-        todayEl.appendChild(weatherTodayEl)
+        let tempRangeData = Math.floor(data["current"]["feelslike_c"]);
+        weatherTodayEl.appendChild(document.createTextNode(`Fells like : ${tempRangeData}°C`));
+        todayEl.appendChild(imgWeather);
+        todayEl.appendChild(weatherTodayEl);
 
-    }).catch((err)=>{
-        errorFunction();
-        console.error(err);
-    })
-    ;
-
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7`)
-    .then((res)=>{
-        // if(!res.ok){
-        //     throw new Error("This location data is not availbale")
-        // }
-        return res.json()
-    }).then((data)=>{
-        console.log(data);
+        //container
         //wind-data
+
         let windDataKm = document.createElement("p")
         windDataKm.className = "today-wind-speed"
         let windDirection = document.createElement("p")
@@ -215,67 +208,24 @@ navigator.geolocation.getCurrentPosition((position)=>{
             weeklyDataEl.appendChild(weeklyDivEl)
         });
     }).catch((error)=>{
-        console.error(error);
+        errorFunction();
     })
 })
 
-//btn-click
-searchBtn.addEventListener("click",()=>{
-    let locationName = inputSearch.value;
-    if (weatherData.children.length) {
-        while (weatherData.firstChild) {
-            weatherData.removeChild(weatherData.firstChild);
-        }
-    }
-    if(todayEl.children.length){
-        while(todayEl.firstChild){
-            todayEl.removeChild(todayEl.firstChild)
-        }
-    }
-    
-    if(windParentEl.children.length){
-        while(windParentEl.firstChild){
-            windParentEl.removeChild(windParentEl.firstChild)
-        }
-    }
-    if(sunParentEl.children.length){
-        while(sunParentEl.firstChild){
-            sunParentEl.removeChild(sunParentEl.firstChild)
-        }
-    }
-    if(rainParentEl.children.length){
-        while(rainParentEl.firstChild){
-            rainParentEl.removeChild(rainParentEl.firstChild)
-        }
-    }
-    if(humidityParentEl.children.length){
-        while(humidityParentEl.firstChild){
-            humidityParentEl.removeChild(humidityParentEl.firstChild)
-        }
-    }
-    if(visibilityParentEl.children.length){
-        while(visibilityParentEl.firstChild){
-            visibilityParentEl.removeChild(visibilityParentEl.firstChild)
-        }
-    }
-    if(uvIndexParentEl.children.length){
-        while(uvIndexParentEl.firstChild){
-            uvIndexParentEl.removeChild(uvIndexParentEl.firstChild)
-        }
-    }
-    if(weeklyDataEl.children.length){
-        while(weeklyDataEl.firstChild){
-            weeklyDataEl.removeChild(weeklyDataEl.firstChild)
-        }
-    }
+//function-render
+function renderData(locationName){
+    weatherToday.style.display="flex";
+    mainContainer.style.display="block";
     fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${locationName}&days=7`)
     .then((res)=>{
         if(!res.ok){
             throw new Error("This Location Data not available")
         }
-        return res.json()
+        return res.json();
     }).then((data)=>{
         console.log(data);
+        //error
+        errorDiv.style.display='none';
         //img-data
         let imgData = document.createElement("div");
         imgData.className = "img-data";
@@ -311,7 +261,6 @@ searchBtn.addEventListener("click",()=>{
         weatherTodayEl.appendChild(document.createTextNode(`Fells like : ${tempRangeData}°C`));
         todayEl.appendChild(imgWeather);
         todayEl.appendChild(weatherTodayEl);
-
         //Container
         //wind-data
         let headingWind = document.createElement("p")
@@ -435,8 +384,8 @@ searchBtn.addEventListener("click",()=>{
             let weekTempEl = document.createElement("p")
             let maxTemp = Math.floor(dataQ["day"]["maxtemp_c"])
             let minTemp = Math.floor(dataQ["day"]["mintemp_c"])
-            weekTempEl.innerHTML = `High:${maxTemp}°C Low:${minTemp}°C`
-            // weekTempEl.appendChild(document.createTextNode(`${maxTemp}°C ${minTemp}°C`))
+            // weekTempEl.innerHTML = `High:${maxTemp}°C Low:${minTemp}°C`
+            weekTempEl.appendChild(document.createTextNode(`High:${maxTemp}°C Low:${minTemp}°C`))
             weeklyDivEl.appendChild(weekDayEl)
             weeklyDivEl.appendChild(weeklyImgEl)
             weeklyDivEl.appendChild(weekTempEl)
@@ -447,6 +396,59 @@ searchBtn.addEventListener("click",()=>{
         console.error(err);
 
     })
-    inputSearch.value='';
 
+}
+
+//btn-click
+searchBtn.addEventListener("click",()=>{
+    let locationName = inputSearch.value;
+    if (weatherData.children.length) {
+        while (weatherData.firstChild) {
+            weatherData.removeChild(weatherData.firstChild);
+        }
+    }
+    if(todayEl.children.length){
+        while(todayEl.firstChild){
+            todayEl.removeChild(todayEl.firstChild)
+        }
+    }
+    
+    if(windParentEl.children.length){
+        while(windParentEl.firstChild){
+            windParentEl.removeChild(windParentEl.firstChild)
+        }
+    }
+    if(sunParentEl.children.length){
+        while(sunParentEl.firstChild){
+            sunParentEl.removeChild(sunParentEl.firstChild)
+        }
+    }
+    if(rainParentEl.children.length){
+        while(rainParentEl.firstChild){
+            rainParentEl.removeChild(rainParentEl.firstChild)
+        }
+    }
+    if(humidityParentEl.children.length){
+        while(humidityParentEl.firstChild){
+            humidityParentEl.removeChild(humidityParentEl.firstChild)
+        }
+    }
+    if(visibilityParentEl.children.length){
+        while(visibilityParentEl.firstChild){
+            visibilityParentEl.removeChild(visibilityParentEl.firstChild)
+        }
+    }
+    if(uvIndexParentEl.children.length){
+        while(uvIndexParentEl.firstChild){
+            uvIndexParentEl.removeChild(uvIndexParentEl.firstChild)
+        }
+    }
+    if(weeklyDataEl.children.length){
+        while(weeklyDataEl.firstChild){
+            weeklyDataEl.removeChild(weeklyDataEl.firstChild)
+        }
+    }
+    inputSearch.value='';
+    //render-function
+    renderData(locationName)
 })
