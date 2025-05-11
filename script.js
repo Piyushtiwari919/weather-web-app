@@ -92,7 +92,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
         
         //today-el
         let imgWeather = document.createElement("img");
-        imgWeather.setAttribute("src",`http://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
+        imgWeather.setAttribute("src",`https://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
         let weatherTodayEl = document.createElement("p");
         weatherTodayEl.className = "weather-today-p";
         weatherTodayEl.appendChild(document.createTextNode(`${data["weather"][0]["main"]}`));
@@ -105,7 +105,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
     })
     ;
 
-    fetch(`http://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7`)
+    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7`)
     .then((res)=>{
         // if(!res.ok){
         //     throw new Error("This location data is not availbale")
@@ -268,7 +268,7 @@ searchBtn.addEventListener("click",()=>{
             weeklyDataEl.removeChild(weeklyDataEl.firstChild)
         }
     }
-    fetch(`http://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${locationName}&days=7`)
+    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${locationName}&days=7`)
     .then((res)=>{
         if(!res.ok){
             throw new Error("This Location Data not available")
