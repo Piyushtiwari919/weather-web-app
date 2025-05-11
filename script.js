@@ -18,6 +18,22 @@ const rainParentEl = document.querySelector(".today-rain")
 const uvIndexParentEl = document.querySelector(".today-uv-index")
 let errorDiv = document.createElement("div")
 
+function locationError(){
+    weatherToday.style.display="none";
+    mainContainer.style.display="none";
+    if(locationErrorEl.children.length){
+        console.log('Location Error');
+    }
+    else{
+        locationErrorEl.style.display = 'flex';
+        locationErrorEl.className = 'location-error'
+        let errorEl = document.createElement("p")
+        errorEl.appendChild(document.createElement(`We couldn't access your location. Make sure location services are turned ON in your phone's settings, then reload the page.`))
+        locationErrorEl.appendChild(errorEl)
+        document.body.appendChild(locationErrorEl)
+    }
+}
+
 function errorFunction(){
     weatherToday.style.display="none";
     mainContainer.style.display="none";
@@ -68,6 +84,8 @@ navigator.geolocation.getCurrentPosition((position)=>{
         //For-Allocation
         weatherToday.style.display="flex";
         mainContainer.style.display="block";
+        errorDiv.style.display='none';
+        locationErrorEl.style.display = 'none';
         //image-element
         let imgData = document.createElement("div");
         imgData.className = "img-data";
@@ -227,8 +245,6 @@ navigator.geolocation.getCurrentPosition((position)=>{
 
 //function-render
 function renderData(locationName){
-    weatherToday.style.display="flex";
-    mainContainer.style.display="block";
     fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${locationName}&days=7`)
     .then((res)=>{
         if(!res.ok){
@@ -237,8 +253,12 @@ function renderData(locationName){
         return res.json();
     }).then((data)=>{
         console.log(data);
+        //weather-data
+        weatherToday.style.display="flex";
+        mainContainer.style.display="block";
         //error
         errorDiv.style.display='none';
+        locationErrorEl.style.display = 'none';
         //img-data
         let imgData = document.createElement("div");
         imgData.className = "img-data";
