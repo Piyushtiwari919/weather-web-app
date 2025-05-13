@@ -203,3 +203,27 @@ body{
     align-items: center;
 }
 
+footer{
+    margin:0;
+}
+footer .footer-div{
+    background-color: #212121;
+    color:#fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    font-size: 1.25rem;
+}
+.link-section{
+    margin-bottom: 0.2em;
+    width:100%;
+    display: flex;
+    justify-content: space-between;
+}
+.link-section a{
+    text-decoration: none;
+    color:#fff;
+    margin:0.5em 0.8em 0.5em 0.5em;
+}
