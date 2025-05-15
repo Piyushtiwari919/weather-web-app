@@ -194,7 +194,7 @@ body{
     align-items: center;
 }
 
-.error-search-div{
+.error-div-parent{
     font-size: 2rem;
     display: flex;
     text-align: center;
