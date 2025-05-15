@@ -185,7 +185,7 @@ body{
     font-size: 1.32rem;
 }
 
-.location-error{
+.location-error-parent{
     font-size: 1.8rem;
     display: flex;
     text-align: center;
