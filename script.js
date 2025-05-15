@@ -35,13 +35,11 @@ function locationError(){
         locationErrorEl.style.display = 'flex';
     } else {
         locationErrorEl.style.display = 'flex';
-        locationErrorEl.className = 'location-error';
 
         let errorEl = document.createElement("p");
         errorEl.textContent = "We couldn't access your location. Make sure location services are turned ON in your phone's settings, then reload the page.";
 
         locationErrorEl.appendChild(errorEl);
-        document.body.appendChild(locationErrorEl);
     }
 }
 
@@ -58,14 +56,12 @@ function errorFunction(){
     }
     else{
         errorDiv.style.display = "flex";
-        errorDiv.className = "error-search-div"
         let errorEl1 = document.createElement("p")
         let errorEl2 = document.createElement("p")
         errorEl1.appendChild(document.createTextNode("Sorry! No Data Available"))
         errorEl2.appendChild(document.createTextNode(`Try searching different location`))
         errorDiv.appendChild(errorEl1)
         errorDiv.appendChild(errorEl2)
-        document.body.appendChild(errorDiv);
     }
 };
 fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature").then((res)=>{
