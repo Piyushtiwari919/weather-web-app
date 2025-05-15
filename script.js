@@ -16,12 +16,17 @@ const humidityParentEl = document.querySelector(".today-humidity")
 const visibilityParentEl = document.querySelector(".today-visibility")
 const rainParentEl = document.querySelector(".today-rain")
 const uvIndexParentEl = document.querySelector(".today-uv-index")
-let errorDiv = document.createElement("div")
-let locationErrorEl = document.createElement("div")
+let errorDiv = document.querySelector(".error-div-parent")
+let locationErrorEl = document.querySelector(".location-error-parent")
+const footerEl = document.querySelector("footer")
 
 function locationError(){
     weatherToday.style.display="none";
     mainContainer.style.display="none";
+    footerEl.style.position = 'absolute'
+    footerEl.style.bottom = 0;
+    footerEl.style.right= 0;
+    footerEl.style.left = 0;
     if (errorDiv.children.length) {
     errorDiv.style.display = 'none';
     }
@@ -43,6 +48,10 @@ function locationError(){
 function errorFunction(){
     weatherToday.style.display="none";
     mainContainer.style.display="none";
+    footerEl.style.position = 'absolute';
+    footerEl.style.bottom = 0;
+    footerEl.style.right= 0;
+    footerEl.style.left = 0;
     if(errorDiv.children.length){
         console.log("try searching new location");
         errorDiv.style.display = "flex";
@@ -65,6 +74,9 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
     }
     return res.json()
 }).then((data)=>{
+    //for-footer
+    footerEl.style.position = "static";
+    //for-data
     let imgUnsplash = document.createElement("img")
     if(data){
         imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`)
@@ -259,6 +271,9 @@ function renderData(locationName){
         }
         return res.json();
     }).then((data)=>{
+        //for-footer
+        footerEl.style.position = "static";
+        //for-data
         console.log(data);
         //weather-data
         weatherToday.style.display="flex";
