@@ -343,7 +343,6 @@ function renderData(locationName){
         errorDiv.style.display='none';
         locationErrorEl.style.display = 'none';
         //for-aqi-data
-        airQualityEl.replaceChildren();
         for(let i = 0 ; i<6;i++){
             let divAqiData = document.createElement("div");
             divAqiData.className = 'div-aqi-data';
@@ -620,6 +619,7 @@ searchBtn.addEventListener("click",()=>{
                 weeklyDataEl.removeChild(weeklyDataEl.firstChild)
             }
         }
+        airQualityEl.replaceChildren();
         inputSearch.value='';
         //render-function
         renderData(locationName)
