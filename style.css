@@ -1,4 +1,5 @@
 /*Start*/
+
 *, *::before, *::after{
     box-sizing: border-box;
 }
@@ -6,7 +7,6 @@ body{
     margin: 0;
     padding:0;
     font-family: "Raleway",sans-serif,"cursive";
-    background-color: #f5f2f2;
 }
 .intro{
     background-color: #CEEDDB;
@@ -15,28 +15,28 @@ body{
 
 .search{
     display: inline-block;
+    background-color: #CEEDDB;
     margin:0.2em;
     margin-bottom: 1em;
-    background-color: #CEEDDB;
     border: 2px solid #5a5959;
     border-radius: 5px;
     padding:2px;
 }
 .input-search{
     margin:0 0.2em;
-    padding:0.22em;
     background-color: #CEEDDB;
+    padding:0.22em;
     font-size: 1rem;
     border: none;
     outline: none;
     max-width:135px;
     border-radius: 2px;
+
 }
 
 .weather-search-btn{
     border:none;
-    color:white; 
-     /*background-color: #CEEDDB; */
+    color:white;
     background-color: #3a56c9;
     border-radius: 5px;
     padding:0.2em;
@@ -52,6 +52,10 @@ body{
 }
 .weather-today h2{
     font-size: 2rem;
+}
+
+.span-today-el{
+    font-size: 1.25rem;
 }
 .weather-data{
     display: flex;
@@ -134,7 +138,6 @@ body{
 .weekly-data p{
     margin: 8px 0;
     font-size: 1rem;
-    color: #121111;
 }
 
 .weekly-data img {
@@ -150,9 +153,12 @@ body{
     transition: transform 0.2s ease;
 }
 .weekly-data div:hover{
-    background-color: #d4dcfe;
+    background-color: #fdfefd;
 }
-.weekly-data div:hover,.today-highlights div:hover{
+.weekly-data div p{
+    color:#272307;
+}
+.weekly-data div:hover,.today-highlights div:hover , .air-quality-data div:hover{
     transform: translateY(-5px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
@@ -165,7 +171,7 @@ body{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.today-highlights div {
+.today-highlights div , .air-quality-data div{
     border-radius: 12px;
     flex: 1 1 calc(33.333% - 16px);
     padding: 16px;
@@ -174,17 +180,17 @@ body{
     text-align: center;
     transition: transform 0.2s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border:2px solid blueviolet;
 }
 
 .today-wind{
     font-size: 1.3rem;
 }
 
-.today-wind p,.sun-data p,.today-humidity p,.today-visibility p,.today-rain p,.today-uv-index p{
+.today-wind p,.pressure-data p,.today-humidity p,.today-visibility p,.today-rain p,.today-uv-index p{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 1.32rem;
 }
-
 .location-error-parent{
     font-size: 1.8rem;
     display: flex;
@@ -193,16 +199,37 @@ body{
     justify-content: center;
     align-items: center;
 }
-
-.error-div-parent{
-    font-size: 2rem;
+.aqi-data-section{
+    max-width: 900px;
     display: flex;
-    text-align: center;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
+    border-top: 1px solid #212121;
+    margin:0.8em auto;
+    padding:10px;
+
+}
+.air-quality-data{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap:10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.air-quality-data div{
+    font-size: 1.2rem;
+    border:2px solid blueviolet;
+}
+.air-quality-data div:hover{
+    background-color:#CEEDDB;
 }
 
+.aqi-heading-h2{
+    font-size: 2rem;
+}
 footer{
     margin:0;
 }
@@ -225,5 +252,16 @@ footer .footer-div{
 .link-section a{
     text-decoration: none;
     color:#fff;
-    margin:0.5em 0.9em 0.8em 0.9em;
+    margin:0.5em 0.8em 0.5em 0.5em;
+}
+
+/* error styling */
+.error-div-parent{
+    font-size: 2rem;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
 }
