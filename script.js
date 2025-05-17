@@ -173,7 +173,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
         //visibility-data
         let visibiltyRangeEl = document.createElement("p")
         let visibilityData = data["current"]["vis_km"]
-        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData}`))
+        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData}Km`))
         let visibilityDataEl = document.createElement("p")
         if(visibilityData>=10){
             visibilityDataEl.appendChild(document.createTextNode('Good 🙂'))
@@ -364,7 +364,7 @@ function renderData(locationName){
         headingVisibility.appendChild(document.createTextNode(`Visibility`))
         let visibiltyRangeEl = document.createElement("p")
         let visibilityData = data["current"]["vis_km"]
-        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData}`))
+        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData}Km`))
         let visibilityDataEl = document.createElement("p")
         if(visibilityData>=10){
             visibilityDataEl.appendChild(document.createTextNode('Good 🙂'))
