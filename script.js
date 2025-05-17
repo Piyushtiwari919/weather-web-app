@@ -1,4 +1,3 @@
-
 //Start
 const weatherToday = document.querySelector(".weather-today")
 const weatherData = document.querySelector(".weather-data")
@@ -11,24 +10,39 @@ const inputSearch = document.querySelector(".input-search")
 const searchBtn = document.querySelector(".weather-search-btn")
 const todayDataH2 = document.querySelector(".today-weather-h2")
 const windParentEl = document.querySelector(".today-wind")
-const sunParentEl = document.querySelector(".sun-data")
+const pressureParentEl = document.querySelector(".pressure-data")
 const humidityParentEl = document.querySelector(".today-humidity")
 const visibilityParentEl = document.querySelector(".today-visibility")
 const rainParentEl = document.querySelector(".today-rain")
 const uvIndexParentEl = document.querySelector(".today-uv-index")
+const airQualityEl = document.querySelector(".air-quality-data")
+const aqiSection = document.querySelector(".aqi-data-section")
 let errorDiv = document.querySelector(".error-div-parent")
 let locationErrorEl = document.querySelector(".location-error-parent")
 const footerEl = document.querySelector("footer")
 
+//aqi-array 
+let aqiArray = [
+    {0:"The range shows that the air quality is good and it poses no health threat."},
+    {1:"This range is moderate and the quality is acceptable. Some people may experience discomfort."},
+    {2:"The air quality in this range is unhealthy for sensitive groups. They experience breathing discomfort."},
+    {3:"The range shows unhealthy air quality and people start to experience effects such as breathing difficulty."},
+    {4:"Air quality is very unhealthy in this range and health warnings may be issued for emergency conditions. All people are likely to be affected."},
+    {5:"This is the hazardous category of air quality and serious health impacts such as breathing discomfort, suffocation, airway irritation, etc. may be experienced by all."}
+]
+let aqiDataArray = ["Particulate Matter","Particulate Matter","Sulphur Dioxide",'Carbon Monoxide','Nitrogen Dioxide','Ozone']
+let aqiDataArrayshort = ['PM2.5','PM10','SO2','CO','NO2','O3']
+let aqiRenderArray = ['pm2_5','pm10','so2','co','no2','o3']
 function locationError(){
-    weatherToday.style.display="none";
-    mainContainer.style.display="none";
     footerEl.style.position = 'absolute'
     footerEl.style.bottom = 0;
     footerEl.style.right= 0;
     footerEl.style.left = 0;
+    weatherToday.style.display="none";
+    mainContainer.style.display="none";
+    aqiSection.style.display = 'none';
     if (errorDiv.children.length) {
-    errorDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
     }
     if (locationErrorEl.children.length) {
         console.log('Location Error');
@@ -41,15 +55,16 @@ function locationError(){
 
         locationErrorEl.appendChild(errorEl);
     }
-}
 
+}
 function errorFunction(){
-    weatherToday.style.display="none";
-    mainContainer.style.display="none";
     footerEl.style.position = 'absolute';
     footerEl.style.bottom = 0;
     footerEl.style.right= 0;
     footerEl.style.left = 0;
+    weatherToday.style.display="none";
+    mainContainer.style.display="none";
+    aqiSection.style.display = 'none';
     if(errorDiv.children.length){
         console.log("try searching new location");
         errorDiv.style.display = "flex";
@@ -70,9 +85,6 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
     }
     return res.json()
 }).then((data)=>{
-    //for-footer
-    footerEl.style.position = "static";
-    //for-data
     let imgUnsplash = document.createElement("img")
     if(data){
         imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`)
@@ -88,7 +100,7 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
 
 navigator.geolocation.getCurrentPosition((position)=>{
     console.log(position);
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7`)
+    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7&aqi=yes`)
     .then((res)=>{
         if(!res.ok){
             throw new Error("This location data is not availbale")
@@ -96,11 +108,47 @@ navigator.geolocation.getCurrentPosition((position)=>{
         return res.json()
     }).then((data)=>{
         console.log(data);
+
         //For-Allocation
+        footerEl.style.position = "static";
         weatherToday.style.display="flex";
         mainContainer.style.display="block";
+        aqiSection.style.display = 'block';
         errorDiv.style.display='none';
         locationErrorEl.style.display = 'none';
+        //for-AirQuality
+        for(let i = 0 ; i<6;i++){
+            let divAqiData = document.createElement("div")
+            divAqiData.className = 'div-aqi-data';
+            let aqiHeadingEl = document.createElement('p');
+            aqiHeadingEl.appendChild(document.createTextNode(`${aqiDataArray[i]}`));
+            let aqiTextEl = document.createElement("p")
+            aqiTextEl.appendChild(document.createTextNode(`(${aqiDataArrayshort[i]})`))
+            let aqiPaData = document.createElement("p")
+            let aqiValueData = data['current']['air_quality'][aqiRenderArray[i]]
+            if(aqiDataArrayshort[i]==='PM10' || aqiDataArrayshort[i]==='PM2.5'){
+                if(aqiValueData>=100){
+                    divAqiData.style.backgroundColor = '#ee7777';
+                }
+                else if(aqiValueData>50){
+                    divAqiData.style.backgroundColor = '#dc7a8a';
+                }
+                
+                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
+            }
+            else{
+                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} ppb`))
+                
+                
+            }
+            
+            
+            divAqiData.appendChild(aqiHeadingEl)
+            divAqiData.appendChild(aqiTextEl);
+            divAqiData.appendChild(aqiPaData)
+            airQualityEl.appendChild(divAqiData)
+
+        }
         //image-element
         let imgData = document.createElement("div");
         imgData.className = "img-data";
@@ -128,13 +176,26 @@ navigator.geolocation.getCurrentPosition((position)=>{
         weatherData.appendChild(dateEl);
 
         //today-el
-        let imgWeather = document.createElement("img");
-        imgWeather.setAttribute("src",`${data["current"]["condition"]["icon"]}`);
+        let todayFeelTemp = data["current"]["feelslike_c"]
+        let spanTodayEl = document.createElement('span')
+        spanTodayEl.className = 'span-today-el';
+        if(todayFeelTemp>=35){
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-high"></i>`
+        }
+        else if(todayFeelTemp>15 && todayFeelTemp<35){
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-three-quarters"></i>`
+        }
+        else if(todayFeelTemp>0 && todayFeelTemp<15){
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-quarter"></i>`
+        }
+        else{
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-low"></i>`
+        }
         let weatherTodayEl = document.createElement("p");
         weatherTodayEl.className = "weather-today-p";
-        let tempRangeData = Math.floor(data["current"]["feelslike_c"]);
-        weatherTodayEl.appendChild(document.createTextNode(`Fells like : ${tempRangeData}°C`));
-        todayEl.appendChild(imgWeather);
+        let tempRangeData = Math.floor(todayFeelTemp);
+        weatherTodayEl.appendChild(document.createTextNode(`Feels like : ${tempRangeData}°C`));
+        todayEl.appendChild(spanTodayEl);
         todayEl.appendChild(weatherTodayEl);
 
         //container
@@ -147,13 +208,13 @@ navigator.geolocation.getCurrentPosition((position)=>{
         windDirection.innerHTML = `<i class="fa-regular fa-compass"></i> ${data["current"]["wind_dir"]}`
         windDataKm.appendChild(windDirection)
         windParentEl.appendChild(windDataKm)
-        //sun-data
-        let sunriseEl = document.createElement("p")
-        let sunsetEl = document.createElement("p")
-        sunriseEl.innerHTML = `<i class="fa-regular fa-circle-up"></i> ${data["forecast"]["forecastday"][0]["astro"]["sunrise"]}`
-        sunsetEl.innerHTML = `<i class="fa-regular fa-circle-down"></i> ${data["forecast"]["forecastday"][0]["astro"]["sunset"]}`
-        sunParentEl.appendChild(sunriseEl)
-        sunParentEl.appendChild(sunsetEl)
+        //pressure-data
+        let pressureEl = document.createElement('p')
+        pressureEl.appendChild(document.createTextNode(`${data['current']['pressure_mb']} hPa`))
+        let pressureTextEl = document.createElement('p')
+        pressureTextEl.appendChild(document.createTextNode('Normal 🤘'))
+        pressureParentEl.appendChild(pressureEl);
+        pressureParentEl.appendChild(pressureTextEl);
         //humidity-data
         let humidityData = data["current"]["humidity"]
         let humidityEl = document.createElement("p")
@@ -171,8 +232,8 @@ navigator.geolocation.getCurrentPosition((position)=>{
         humidityParentEl.appendChild(humidityEl)
         humidityParentEl.appendChild(humidtyDataEl)
         //visibility-data
-        let visibiltyRangeEl = document.createElement("p")
-        let visibilityData = data["current"]["vis_km"]
+        let visibiltyRangeEl = document.createElement("p");
+        let visibilityData = data["current"]["vis_km"];
         visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData} km`))
         let visibilityDataEl = document.createElement("p")
         if(visibilityData>=10){
@@ -188,8 +249,13 @@ navigator.geolocation.getCurrentPosition((position)=>{
         visibilityParentEl.appendChild(visibilityDataEl)
         //rain-data
         let rainDataEl = document.createElement("p")
-        rainDataEl.appendChild(document.createTextNode(`${data["current"]["precip_mm"]} mm`))
-        rainParentEl.appendChild(rainDataEl)
+        let rainTodayData = data["current"]["precip_mm"]
+        rainDataEl.appendChild(document.createTextNode(`${rainTodayData} mm`))
+        let rainTextEl = document.createElement('p');
+        let todayPpDate = new Date()
+        rainTextEl.appendChild(document.createTextNode(`${data['forecast']['forecastday'][0]['hour'][todayPpDate.getHours()]['condition']['text']}`))
+        rainParentEl.appendChild(rainDataEl);
+        rainParentEl.appendChild(rainTextEl);
 
         //uv-data
         let uvDataEl = document.createElement("p")
@@ -260,23 +326,51 @@ navigator.geolocation.getCurrentPosition((position)=>{
 
 //function-render
 function renderData(locationName){
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${locationName}&days=7`)
+    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${locationName}&days=7&aqi=yes`)
     .then((res)=>{
         if(!res.ok){
             throw new Error("This Location Data not available")
         }
         return res.json();
     }).then((data)=>{
-        //for-footer
-        footerEl.style.position = "static";
-        //for-data
         console.log(data);
         //weather-data
+        footerEl.style.position = "static";
         weatherToday.style.display="flex";
         mainContainer.style.display="block";
+        aqiSection.style.display = 'block';
         //error
         errorDiv.style.display='none';
         locationErrorEl.style.display = 'none';
+        //for-aqi-data
+        airQualityEl.replaceChildren();
+        for(let i = 0 ; i<6;i++){
+            let divAqiData = document.createElement("div");
+            divAqiData.className = 'div-aqi-data';
+            let aqiHeadingEl = document.createElement('p');
+            aqiHeadingEl.appendChild(document.createTextNode(`${aqiDataArray[i]}`));
+            let aqiTextEl = document.createElement("p");
+            aqiTextEl.appendChild(document.createTextNode(`(${aqiDataArrayshort[i]})`));
+            let aqiPaData = document.createElement("p");
+            let aqiValueData = data['current']['air_quality'][aqiRenderArray[i]];
+            if(aqiDataArrayshort[i]==='PM10' || aqiDataArrayshort[i]==='PM2.5'){
+                if(aqiValueData>=100){
+                    divAqiData.style.backgroundColor = '#ee7777';
+                }
+                else if(aqiValueData>50){
+                    divAqiData.style.backgroundColor = '#dc7a8a';
+                }
+                
+                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
+            }
+            else{
+                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} ppb`))
+            }
+            divAqiData.appendChild(aqiHeadingEl)
+            divAqiData.appendChild(aqiTextEl);
+            divAqiData.appendChild(aqiPaData);
+            airQualityEl.appendChild(divAqiData);
+        }
         //img-data
         let imgData = document.createElement("div");
         imgData.className = "img-data";
@@ -304,44 +398,60 @@ function renderData(locationName){
         weatherData.appendChild(dateEl);
 
         //today-el
-        let imgWeather = document.createElement("img");
-        imgWeather.setAttribute("src",`${data["current"]["condition"]["icon"]}`);
+        let todayFeelTemp = data["current"]["feelslike_c"]
+        let spanTodayEl = document.createElement('span')
+        spanTodayEl.className = 'span-today-el';
+        if(todayFeelTemp>=35){
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-high"></i>`
+        }
+        else if(todayFeelTemp>15 && todayFeelTemp<35){
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-three-quarters"></i>`
+        }
+        else if(todayFeelTemp>0 && todayFeelTemp<15){
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-quarter"></i>`
+        }
+        else{
+            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-low"></i>`
+        }
         let weatherTodayEl = document.createElement("p");
         weatherTodayEl.className = "weather-today-p";
-        let tempRangeData = Math.floor(data["current"]["feelslike_c"]);
-        weatherTodayEl.appendChild(document.createTextNode(`Fells like : ${tempRangeData}°C`));
-        todayEl.appendChild(imgWeather);
+        let tempRangeData = Math.floor(todayFeelTemp);
+        weatherTodayEl.appendChild(document.createTextNode(`Feels like : ${tempRangeData}°C`));
+        todayEl.appendChild(spanTodayEl);
         todayEl.appendChild(weatherTodayEl);
+
         //Container
         //wind-data
-        let headingWind = document.createElement("p")
+        let headingWind = document.createElement("p");
         headingWind.className = "highlights-heading"
-        headingWind.appendChild(document.createTextNode(`Wind Status`))
-        let windDataKm = document.createElement("p")
-        windDataKm.className = "today-wind-speed"
-        let windDirection = document.createElement("p")
-        windDataKm.appendChild(document.createTextNode(`${data["current"]["wind_kph"]} km/hr`))
-        windDirection.innerHTML = `<i class="fa-regular fa-compass"></i> ${data["current"]["wind_dir"]}`
+        headingWind.innerHTML = `<i class="fa-solid fa-wind"></i> Wind Status`;
+        let windDataKm = document.createElement("p");
+        windDataKm.className = "today-wind-speed";
+        let windDirection = document.createElement("p");
+        windDataKm.appendChild(document.createTextNode(`${data["current"]["wind_kph"]} km/hr`));
+        windDirection.innerHTML = `<i class="fa-regular fa-compass"></i> ${data["current"]["wind_dir"]}`;
         windParentEl.appendChild(headingWind)
         windDataKm.appendChild(windDirection)
         windParentEl.appendChild(windDataKm)
        
-        //sun-data
-        let headingSun = document.createElement("p")
-        headingSun.className = "highlights-heading"
-        headingSun.appendChild(document.createTextNode(`Sunrise & Sunset`))
-        let sunriseEl = document.createElement("p")
-        let sunsetEl = document.createElement("p")
-        sunriseEl.innerHTML = `<i class="fa-regular fa-circle-up"></i> ${data["forecast"]["forecastday"][0]["astro"]["sunrise"]}`
-        sunsetEl.innerHTML = `<i class="fa-regular fa-circle-down"></i> ${data["forecast"]["forecastday"][0]["astro"]["sunset"]}`
-        sunParentEl.appendChild(headingSun)
-        sunParentEl.appendChild(sunriseEl)
-        sunParentEl.appendChild(sunsetEl)
+        //pressure-data
+        let headingPressure = document.createElement("p")
+        headingPressure.className = "highlights-heading"
+        headingPressure.innerHTML = `<i class="fa-regular fa-face-smile"></i> Air Pressure`
+        let pressureEl = document.createElement('p')
+        pressureEl.appendChild(document.createTextNode(`${data['current']['pressure_mb']} hPa`))
+        let pressureTextEl = document.createElement('p')
+        pressureTextEl.appendChild(document.createTextNode('Normal 🤘'))
+        pressureParentEl.appendChild(headingPressure);
+        pressureParentEl.appendChild(pressureEl);
+        pressureParentEl.appendChild(pressureTextEl);
+
+        
         //humidity-data
-        let headingHumidity = document.createElement("p")
-        headingHumidity.className = "highlights-heading"
-        headingHumidity.appendChild(document.createTextNode(`Humidity`))
-        let humidityData = data["current"]["humidity"]
+        let headingHumidity = document.createElement("p");
+        headingHumidity.className = "highlights-heading";
+        headingHumidity.innerHTML = `<i class="fa-solid fa-droplet"></i> Humidity`
+        let humidityData = data["current"]["humidity"];
         let humidityEl = document.createElement("p")
         humidityEl.appendChild(document.createTextNode(`${humidityData}%`))
         let humidtyDataEl = document.createElement("p")
@@ -382,20 +492,30 @@ function renderData(locationName){
         //rain-data
         let headingRain = document.createElement("p")
         headingRain.className = "highlights-heading"
-        headingRain.innerHTML = `<p>Precipitation</p><i class="fa-solid fa-snowflake"></i>`
+        headingRain.innerHTML = `<p><i class="fa-solid fa-snowflake"></i> Precipitation</p>`
         let rainDataEl = document.createElement("p")
-        rainDataEl.appendChild(document.createTextNode(`${data["current"]["precip_mm"]} mm`))
+        let rainTodayData = data["current"]["precip_mm"]
+        rainDataEl.appendChild(document.createTextNode(`${rainTodayData} mm`))
+        let rainTextEl = document.createElement('p');
+        let todayPpDate = new Date()
+        rainTextEl.appendChild(document.createTextNode(`${data['forecast']['forecastday'][0]['hour'][todayPpDate.getHours()]['condition']['text']}`))
         rainParentEl.appendChild(headingRain)
         rainParentEl.appendChild(rainDataEl)
-
+        rainParentEl.appendChild(rainTextEl);    
 
         //uv-data
+        let uvData = data["current"]["uv"]
         let headingUvI = document.createElement("p")
         headingUvI.className = "highlights-heading"
-        headingUvI.appendChild(document.createTextNode(`Uv Index`))
+        if(uvData>0){
+            headingUvI.innerHTML = `<i class="fa-solid fa-sun"></i> Uv Index`
+        }
+        else{
+            headingUvI.innerHTML = `<i class="fa-regular fa-moon"></i> Uv Index`
+        }
         let uvDataEl = document.createElement("p")
         let uvRangeEl = document.createElement("p")
-        let uvData = data["current"]["uv"]
+        
         uvDataEl.appendChild(document.createTextNode(`${uvData}`))
         if(0<=uvData && uvData<=2){
             uvRangeEl.appendChild(document.createTextNode('Normal 🙂'))
@@ -453,53 +573,55 @@ function renderData(locationName){
 //btn-click
 searchBtn.addEventListener("click",()=>{
     let locationName = inputSearch.value;
-    if (weatherData.children.length) {
-        while (weatherData.firstChild) {
-            weatherData.removeChild(weatherData.firstChild);
+    if(locationName){
+        if (weatherData.children.length) {
+            while (weatherData.firstChild) {
+                weatherData.removeChild(weatherData.firstChild);
+            }
         }
-    }
-    if(todayEl.children.length){
-        while(todayEl.firstChild){
-            todayEl.removeChild(todayEl.firstChild)
+        if(todayEl.children.length){
+            while(todayEl.firstChild){
+                todayEl.removeChild(todayEl.firstChild)
+            }
         }
-    }
-    
-    if(windParentEl.children.length){
-        while(windParentEl.firstChild){
-            windParentEl.removeChild(windParentEl.firstChild)
+        
+        if(windParentEl.children.length){
+            while(windParentEl.firstChild){
+                windParentEl.removeChild(windParentEl.firstChild)
+            }
         }
-    }
-    if(sunParentEl.children.length){
-        while(sunParentEl.firstChild){
-            sunParentEl.removeChild(sunParentEl.firstChild)
+        if(pressureParentEl.children.length){
+            while(pressureParentEl.firstChild){
+                pressureParentEl.removeChild(pressureParentEl.firstChild)
+            }
         }
-    }
-    if(rainParentEl.children.length){
-        while(rainParentEl.firstChild){
-            rainParentEl.removeChild(rainParentEl.firstChild)
+        if(rainParentEl.children.length){
+            while(rainParentEl.firstChild){
+                rainParentEl.removeChild(rainParentEl.firstChild)
+            }
         }
-    }
-    if(humidityParentEl.children.length){
-        while(humidityParentEl.firstChild){
-            humidityParentEl.removeChild(humidityParentEl.firstChild)
+        if(humidityParentEl.children.length){
+            while(humidityParentEl.firstChild){
+                humidityParentEl.removeChild(humidityParentEl.firstChild)
+            }
         }
-    }
-    if(visibilityParentEl.children.length){
-        while(visibilityParentEl.firstChild){
-            visibilityParentEl.removeChild(visibilityParentEl.firstChild)
+        if(visibilityParentEl.children.length){
+            while(visibilityParentEl.firstChild){
+                visibilityParentEl.removeChild(visibilityParentEl.firstChild)
+            }
         }
-    }
-    if(uvIndexParentEl.children.length){
-        while(uvIndexParentEl.firstChild){
-            uvIndexParentEl.removeChild(uvIndexParentEl.firstChild)
+        if(uvIndexParentEl.children.length){
+            while(uvIndexParentEl.firstChild){
+                uvIndexParentEl.removeChild(uvIndexParentEl.firstChild)
+            }
         }
-    }
-    if(weeklyDataEl.children.length){
-        while(weeklyDataEl.firstChild){
-            weeklyDataEl.removeChild(weeklyDataEl.firstChild)
+        if(weeklyDataEl.children.length){
+            while(weeklyDataEl.firstChild){
+                weeklyDataEl.removeChild(weeklyDataEl.firstChild)
+            }
         }
+        inputSearch.value='';
+        //render-function
+        renderData(locationName)
     }
-    inputSearch.value='';
-    //render-function
-    renderData(locationName)
 })
