@@ -1,5 +1,4 @@
 /*Start*/
-
 *, *::before, *::after{
     box-sizing: border-box;
 }
@@ -7,6 +6,7 @@ body{
     margin: 0;
     padding:0;
     font-family: "Raleway",sans-serif,"cursive";
+    /* background-color: #c2e4fb; */
 }
 .intro{
     background-color: #CEEDDB;
@@ -113,7 +113,7 @@ body{
     margin: 0 auto;
     padding: 20px;
 }
-
+/*Weekly Data*/
 .week-info,.today-info{
     text-align: center;
     margin-bottom: 20px;
@@ -162,7 +162,7 @@ body{
     transform: translateY(-5px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
-
+/*Today Highlights*/
 .today-highlights{
     display: flex;
     flex-wrap: wrap;
@@ -191,14 +191,48 @@ body{
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 1.32rem;
 }
-.location-error-parent{
-    font-size: 1.8rem;
-    display: flex;
+
+/*--- Surise and Sunset Section ---*/
+.sunrise-sunset-section{
+    margin-top: 1em;
+    min-height:200px;
+    border-radius: 5px;
+    position: relative;
+    border:2px solid #32c3ee;
     text-align: center;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
+
+.sun-strip-div{
+    background-color: #f8f85c;
+    margin:2em 1em 0.7em 1em;
+    border-radius: 5px;
+    height:10px;
+}
+
+#sun-fa-sun{
+    color:#ff6600;
+    position: absolute;
+    font-size: 2rem;
+    top:68.5px;
+    left:4px;
+}
+
+#moon-fa-moon{
+    position: absolute;
+    font-size: 2rem;
+    top:68.5px;
+    left:8px;
+    display:none;
+}
+
+.sunrise-sunset-timing{
+    display: flex;
+    justify-content: space-between;
+    margin:1em;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+/*Aqi Section*/
 .aqi-data-section{
     max-width: 900px;
     display: flex;
@@ -221,7 +255,6 @@ body{
 }
 .air-quality-data div{
     font-size: 1.2rem;
-    border:2px solid blueviolet;
 }
 .air-quality-data div:hover{
     background-color:#CEEDDB;
@@ -230,6 +263,7 @@ body{
 .aqi-heading-h2{
     font-size: 2rem;
 }
+/*Footer Section*/
 footer{
     margin:0;
 }
@@ -264,4 +298,13 @@ footer .footer-div{
     justify-content: center;
     align-items: center;
     
+}
+
+.location-error-parent{
+    font-size: 1.8rem;
+    display: flex;
+    text-align: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
