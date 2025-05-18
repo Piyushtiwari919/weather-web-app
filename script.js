@@ -17,19 +17,14 @@ const rainParentEl = document.querySelector(".today-rain")
 const uvIndexParentEl = document.querySelector(".today-uv-index")
 const airQualityEl = document.querySelector(".air-quality-data")
 const aqiSection = document.querySelector(".aqi-data-section")
+const sunSectionEl = document.querySelector(".sunrise-sunset-section")
+const sunStripEl = document.querySelector(".sun-strip-div")
+const sunDataEl = document.querySelector(".sun-data-div")
+const sunTimingEl = document.querySelector(".sunrise-sunset-timing")
 let errorDiv = document.querySelector(".error-div-parent")
 let locationErrorEl = document.querySelector(".location-error-parent")
 const footerEl = document.querySelector("footer")
 
-//aqi-array 
-let aqiArray = [
-    {0:"The range shows that the air quality is good and it poses no health threat."},
-    {1:"This range is moderate and the quality is acceptable. Some people may experience discomfort."},
-    {2:"The air quality in this range is unhealthy for sensitive groups. They experience breathing discomfort."},
-    {3:"The range shows unhealthy air quality and people start to experience effects such as breathing difficulty."},
-    {4:"Air quality is very unhealthy in this range and health warnings may be issued for emergency conditions. All people are likely to be affected."},
-    {5:"This is the hazardous category of air quality and serious health impacts such as breathing discomfort, suffocation, airway irritation, etc. may be experienced by all."}
-]
 let aqiDataArray = ["Particulate Matter","Particulate Matter","Sulphur Dioxide",'Carbon Monoxide','Nitrogen Dioxide','Ozone']
 let aqiDataArrayshort = ['PM2.5','PM10','SO2','CO','NO2','O3']
 let aqiRenderArray = ['pm2_5','pm10','so2','co','no2','o3']
@@ -96,19 +91,19 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
     
 }).catch((error)=>{
     document.body.style.backgroundImage = `url(https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDQ2MTkyMDh8&ixlib=rb-4.0.3&q=85)`
-})
+});
 
 navigator.geolocation.getCurrentPosition((position)=>{
     console.log(position);
     fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7&aqi=yes`)
     .then((res)=>{
         if(!res.ok){
-            throw new Error("This location data is not availbale")
+            throw new Error("This location data is not available")
         }
         return res.json()
     }).then((data)=>{
         console.log(data);
-
+        sunSectionEl.style.display = 'block';
         //For-Allocation
         footerEl.style.position = "static";
         weatherToday.style.display="flex";
@@ -118,7 +113,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
         locationErrorEl.style.display = 'none';
         //for-AirQuality
         for(let i = 0 ; i<6;i++){
-            let divAqiData = document.createElement("div")
+            let divAqiData = document.createElement("div");
             divAqiData.className = 'div-aqi-data';
             let aqiHeadingEl = document.createElement('p');
             aqiHeadingEl.appendChild(document.createTextNode(`${aqiDataArray[i]}`));
@@ -141,8 +136,6 @@ navigator.geolocation.getCurrentPosition((position)=>{
                 
                 
             }
-            
-            
             divAqiData.appendChild(aqiHeadingEl)
             divAqiData.appendChild(aqiTextEl);
             divAqiData.appendChild(aqiPaData)
@@ -280,6 +273,72 @@ navigator.geolocation.getCurrentPosition((position)=>{
         uvIndexParentEl.appendChild(uvDataEl)
         uvIndexParentEl.appendChild(uvRangeEl)
         
+        //sunrise-sunset
+        let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
+        let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
+        console.log(sunriseTiming,sunsetTiming);
+        //sun-moon
+        let moonIcon = document.querySelector("#moon-fa-moon");
+        let sunIcon = document.querySelector("#sun-fa-sun");
+        let dateT = new Date()
+        dateTime = dateT.toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" });
+        let sunStripWidth = sunStripEl.getBoundingClientRect().width
+        console.log(Math.floor(sunStripWidth));
+        
+        function toMinutes(timeStr) {
+            let [time, period] = timeStr.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+
+            if (period === 'PM' && hours !== 12) {
+                hours += 12;
+            } else if (period === 'AM' && hours === 12) {
+                hours = 0;
+            }
+            return hours * 60 + minutes;
+        }
+        function subtractTimes(startStr, endStr) {
+            let startMin = toMinutes(startStr);
+            let endMin = toMinutes(endStr);
+            if (endMin < startMin) {
+                endMin += 24 * 60;
+            }
+
+            let diff = endMin - startMin;
+            return(diff/60)
+        }
+        let sunsetWidth = subtractTimes(sunsetTiming,dateTime);
+        let sunriseWidth = subtractTimes(sunriseTiming,dateTime)
+        if(dateTime>sunsetTiming){
+            sunSectionEl.style.backgroundColor = '#213131';
+            moonIcon.style.display = 'block';
+            sunIcon.style.display = 'none';
+            moonIcon.style.color = "#FFF";
+            sunStripEl.style.backgroundColor = '#fd91f0';
+            sunSectionEl.style.color = '#fff';
+            sunTimingEl.style.flexDirection = 'row-reverse';
+            let leftNightPosition = (sunStripWidth/12)*sunsetWidth + 8;
+            console.log(leftNightPosition);
+            moonIcon.style.left = `${leftNightPosition}px`;
+        }
+        else{
+            sunSectionEl.style.backgroundColor = '#fff';
+            sunSectionEl.style.color = '#000';
+            moonIcon.style.display = 'none';
+            sunIcon.style.display = 'block';
+            sunStripEl.style.backgroundColor = '#f8f85c';
+            sunSectionEl.style.color = '#000';
+            sunTimingEl.style.flexDirection = 'row';
+            let leftDayPosition = (sunStripWidth/12)*sunriseWidth + 4;
+            sunIcon.style.left = `${leftDayPosition}px`;
+        }
+        let sunriseEl = document.createElement('p')
+        sunriseEl.appendChild(document.createTextNode(`Sunrise : ${sunriseTiming}`))
+        let sunsetEl = document.createElement('p')
+        sunsetEl.appendChild(document.createTextNode(`Sunset : ${sunsetTiming}`))
+        sunTimingEl.appendChild(sunriseEl)
+        sunTimingEl.appendChild(sunsetEl)
+        
+
         //weekly-data
         data['forecast']['forecastday'].forEach((dataQ)=> {
             console.log(dataQ);
@@ -300,7 +359,6 @@ navigator.geolocation.getCurrentPosition((position)=>{
             let maxTemp = Math.floor(dataQ["day"]["maxtemp_c"])
             let minTemp = Math.floor(dataQ["day"]["mintemp_c"])
             weekTempEl.innerHTML = `High:${maxTemp}°C Low:${minTemp}°C`
-            // weekTempEl.appendChild(document.createTextNode(`${maxTemp}°C ${minTemp}°C`))
             weeklyDivEl.appendChild(weekDayEl)
             weeklyDivEl.appendChild(weeklyImgEl)
             weeklyDivEl.appendChild(weekTempEl)
@@ -418,6 +476,41 @@ function renderData(locationName){
         weatherTodayEl.appendChild(document.createTextNode(`Feels like : ${tempRangeData}°C`));
         todayEl.appendChild(spanTodayEl);
         todayEl.appendChild(weatherTodayEl);
+
+        // //sunrise-sunset
+        // let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
+        // let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
+        // console.log(sunriseTiming,sunsetTiming);
+        // //sun-moon
+        // let moonIcon = document.querySelector("#moon-fa-moon");
+        // let sunIcon = document.querySelector("#sun-fa-sun");
+        // let dateT = new Date()
+        // dateTime = dateT.toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" });
+        // if(dateTime>sunsetTiming){
+        //     sunSectionEl.style.backgroundColor = '#213131';
+        //     moonIcon.style.display = 'block';
+        //     sunIcon.style.display = 'none';
+        //     moonIcon.style.color = "#FFF";
+        //     sunStripEl.style.backgroundColor = '#fdfefd';
+        //     sunSectionEl.style.color = '#fff';
+        //     sunTimingEl.style.flexDirection = 'row-reverse';
+        // }
+        // else{
+        //     sunSectionEl.style.backgroundColor = '#fff';
+        //     sunSectionEl.style.color = '#000';
+        //     moonIcon.style.display = 'none';
+        //     sunIcon.style.display = 'block';
+        //     sunStripEl.style.backgroundColor = '#f8f85c';
+        //     sunSectionEl.style.color = '#000';
+        //     sunTimingEl.style.flexDirection = 'row';
+        // }
+        // //sun-timing
+        // let sunriseEl = document.createElement('p')
+        // sunriseEl.appendChild(document.createTextNode(`Sunrise : ${sunriseTiming}`))
+        // let sunsetEl = document.createElement('p')
+        // sunsetEl.appendChild(document.createTextNode(`Sunset : ${sunsetTiming}`))
+        // sunTimingEl.appendChild(sunriseEl)
+        // sunTimingEl.appendChild(sunsetEl)
 
         //Container
         //wind-data
@@ -619,9 +712,11 @@ searchBtn.addEventListener("click",()=>{
                 weeklyDataEl.removeChild(weeklyDataEl.firstChild)
             }
         }
-        airQualityEl.replaceChildren();
+        sunSectionEl.style.display = 'none';
         inputSearch.value='';
+        airQualityEl.replaceChildren();
         //render-function
         renderData(locationName)
     }
 })
+
