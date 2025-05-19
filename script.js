@@ -273,9 +273,8 @@ navigator.geolocation.getCurrentPosition((position)=>{
         else{
             uvRangeEl.appendChild(document.createTextNode('Extreme 🤕'))
         }
-        uvIndexParentEl.appendChild(uvDataEl)
-        uvIndexParentEl.appendChild(uvRangeEl)
-        
+        uvIndexParentEl.appendChild(uvDataEl);
+        uvIndexParentEl.appendChild(uvRangeEl);
         //sunrise-sunset
         let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
         let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
@@ -284,10 +283,65 @@ navigator.geolocation.getCurrentPosition((position)=>{
         let moonIcon = document.querySelector("#moon-fa-moon");
         let sunIcon = document.querySelector("#sun-fa-sun");
         let dateT = new Date()
+        let sunriseT = false;
         dateTime = dateT.toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" });
         let sunStripWidth = sunStripEl.getBoundingClientRect().width
         console.log(Math.floor(sunStripWidth));
-        
+        // Function to check if current time is before sunrise
+        function checkTimeAndExecute(sunriseTime) {
+            // Get current time
+            let currentTime = new Date();
+            let currentFormattedTime = formatTime(currentTime);
+
+            console.log("Current time: " + currentFormattedTime);
+            console.log("Sunrise time: " + sunriseTime);
+
+            // Convert the sunrise time (e.g., '6:30 AM') to a comparable time in minutes
+            let sunriseMinutes = convertToMinutes(sunriseTime, currentTime);
+            let currentMinutes = convertToMinutes(currentFormattedTime, currentTime);
+
+            // Compare current time with sunrise time (in minutes)
+            if (currentMinutes < sunriseMinutes) {
+                sunriseT = true;
+            } else {
+                sunriseT = false;
+                console.log("Current time is later than sunrise. No task executed.");
+            }
+        }
+
+        // Function to format time from Date object to 'HH:mm' format (e.g., '06:30')
+        function formatTime(date) {
+            let hours = date.getHours();
+            let minutes = date.getMinutes();
+            return (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+        }
+
+        // Function to convert time from '6:30 AM' or '6:30 PM' format to minutes since midnight
+        function convertToMinutes(time, currentTime) {
+            let [timePart, period] = time.split(' ');  // Split the time part from AM/PM
+            let [hours, minutes] = timePart.split(':').map(num => parseInt(num));
+
+            // Convert 12-hour format to 24-hour format based on AM/PM
+            if (period === 'PM' && hours !== 12) {
+                hours += 12;  // Convert PM hours to 24-hour format
+            } else if (period === 'AM' && hours === 12) {
+                hours = 0;  // Convert 12 AM to 00:00 (midnight)
+            }
+
+            // If the current time is after midnight and before sunrise, consider sunrise as the next day
+            let sunriseDate = new Date(currentTime);
+            sunriseDate.setHours(hours);
+            sunriseDate.setMinutes(minutes);
+            sunriseDate.setSeconds(0);
+
+            // If current time is after midnight and the sunrise time is earlier, adjust the sunrise to the next day
+            if (currentTime.getHours() < hours || (currentTime.getHours() === hours && currentTime.getMinutes() < minutes)) {
+                sunriseDate.setDate(sunriseDate.getDate() + 1);  // Move sunrise to the next day
+            }
+
+            return sunriseDate.getHours() * 60 + sunriseDate.getMinutes();  // Convert the time to total minutes since midnight
+        }
+        checkTimeAndExecute(sunriseTiming);
         function toMinutes(timeStr) {
             let [time, period] = timeStr.split(' ');
             let [hours, minutes] = time.split(':').map(Number);
@@ -310,26 +364,16 @@ navigator.geolocation.getCurrentPosition((position)=>{
             // let minutes = diff % 60;
             return(diff/60)
         }
-        //getting-current time
-        function getCurrentTime12hr() {
-            const now = new Date();
-            let hours = now.getHours();
-            const minutes = now.getMinutes();
-            const period = hours >= 12 ? 'PM' : 'AM';
-
-            hours = hours % 12 || 12; // Convert 0–23 into 1–12
-            const paddedMinutes = String(minutes).padStart(2, '0');
-
-            return `${hours}:${paddedMinutes} ${period}`;
-        }
-       
-        let currentTime = toMinutes(getCurrentTime12hr());
-        let sunsetTimeMinutes = toMinutes(sunsetTiming);
         let nDay = subtractTimes(sunriseTiming,sunsetTiming);
         let nNight = subtractTimes(sunsetTiming,sunriseTiming)
         let sunsetWidth = subtractTimes(sunsetTiming,dateTime);
         let sunriseWidth = subtractTimes(sunriseTiming,dateTime);
-        if(currentTime>=sunsetTimeMinutes){
+        console.log(nDay,nNight,sunStripWidth,sunriseWidth,sunsetWidth);
+        
+        
+
+
+        if(sunriseT){
             sunSectionEl.style.backgroundColor = '#113131';
             moonIcon.style.display = 'block';
             sunIcon.style.display = 'none';
@@ -369,7 +413,6 @@ navigator.geolocation.getCurrentPosition((position)=>{
         sunTimingEl.appendChild(sunriseDivEl)
         sunTimingEl.appendChild(sunsetDivEl)
         
-
         //weekly-data
         data['forecast']['forecastday'].forEach((dataQ)=> {
             console.log(dataQ);
