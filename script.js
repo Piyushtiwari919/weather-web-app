@@ -13,6 +13,9 @@ const windParentEl = document.querySelector(".today-wind")
 const pressureParentEl = document.querySelector(".pressure-data")
 const humidityParentEl = document.querySelector(".today-humidity")
 const visibilityParentEl = document.querySelector(".today-visibility")
+const locationNameEl = document.querySelector(".location-name");
+let weekDayH2 = document.querySelector(".week-info");
+let count = 0 ;
 const rainParentEl = document.querySelector(".today-rain")
 const uvIndexParentEl = document.querySelector(".today-uv-index")
 const airQualityEl = document.querySelector(".air-quality-data")
@@ -190,7 +193,8 @@ navigator.geolocation.getCurrentPosition((position)=>{
         weatherTodayEl.appendChild(document.createTextNode(`Feels like : ${tempRangeData}°C`));
         todayEl.appendChild(spanTodayEl);
         todayEl.appendChild(weatherTodayEl);
-
+        //location-name
+        locationNameEl.textContent = `${data['location']['name']} , ${data['location']['country']}`
         //container
         //wind-data
 
@@ -302,21 +306,38 @@ navigator.geolocation.getCurrentPosition((position)=>{
             if (endMin < startMin) {
                 endMin += 24 * 60;
             }
-
             let diff = endMin - startMin;
+            // let hours = Math.floor(diff / 60);
+            // let minutes = diff % 60;
             return(diff/60)
         }
+        //getting-current time
+        function getCurrentTime12hr() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const period = hours >= 12 ? 'PM' : 'AM';
+
+            hours = hours % 12 || 12; // Convert 0–23 into 1–12
+            const paddedMinutes = String(minutes).padStart(2, '0');
+
+            return `${hours}:${paddedMinutes} ${period}`;
+        }
+        let currentTime = toMinutes(getCurrentTime12hr());
+        let sunsetTimeMinutes = toMinutes(sunsetTiming);
+        let n = subtractTimes(sunriseTiming,sunsetTiming);
         let sunsetWidth = subtractTimes(sunsetTiming,dateTime);
-        let sunriseWidth = subtractTimes(sunriseTiming,dateTime)
-        if(dateTime>sunsetTiming){
-            sunSectionEl.style.backgroundColor = '#213131';
+        let sunriseWidth = subtractTimes(sunriseTiming,dateTime);
+        // console.log(n,sunStripWidth,sunriseWidth,sunsetWidth,currentTime,sunsetTimeMinutes);
+        if(currentTime>=sunsetTimeMinutes){
+            sunSectionEl.style.backgroundColor = '#113131';
             moonIcon.style.display = 'block';
             sunIcon.style.display = 'none';
             moonIcon.style.color = "#FFF";
             sunStripEl.style.backgroundColor = '#fd91f0';
             sunSectionEl.style.color = '#fff';
             sunTimingEl.style.flexDirection = 'row-reverse';
-            let leftNightPosition = (sunStripWidth/12)*sunsetWidth + 8;
+            let leftNightPosition = (sunStripWidth/n)*sunsetWidth + 8;
             console.log(leftNightPosition);
             moonIcon.style.left = `${leftNightPosition}px`;
         }
@@ -328,20 +349,31 @@ navigator.geolocation.getCurrentPosition((position)=>{
             sunStripEl.style.backgroundColor = '#f8f85c';
             sunSectionEl.style.color = '#000';
             sunTimingEl.style.flexDirection = 'row';
-            let leftDayPosition = (sunStripWidth/12)*sunriseWidth + 4;
+            let leftDayPosition = (sunStripWidth/n)*sunriseWidth + 4;
             sunIcon.style.left = `${leftDayPosition}px`;
         }
+        let sunriseDivEl = document.createElement("div")
+        let sunsetDivEl = document.createElement('div')
         let sunriseEl = document.createElement('p')
         sunriseEl.appendChild(document.createTextNode(`Sunrise : ${sunriseTiming}`))
+        let sunriseImgEl = document.createElement('img')
+        sunriseImgEl.setAttribute('src','sunrise-org.png')
         let sunsetEl = document.createElement('p')
         sunsetEl.appendChild(document.createTextNode(`Sunset : ${sunsetTiming}`))
-        sunTimingEl.appendChild(sunriseEl)
-        sunTimingEl.appendChild(sunsetEl)
+        let sunsetImgEl = document.createElement('img');
+        sunsetImgEl.setAttribute('src','sunset-org.png')
+        sunriseDivEl.appendChild(sunriseEl)
+        sunriseDivEl.appendChild(sunriseImgEl)
+        sunsetDivEl.appendChild(sunsetEl)
+        sunsetDivEl.appendChild(sunsetImgEl)
+        sunTimingEl.appendChild(sunriseDivEl)
+        sunTimingEl.appendChild(sunsetDivEl)
         
 
         //weekly-data
         data['forecast']['forecastday'].forEach((dataQ)=> {
             console.log(dataQ);
+            count += 1;
             //parent-div
             let weeklyDivEl = document.createElement("div")
             //p-element
@@ -364,6 +396,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
             weeklyDivEl.appendChild(weekTempEl)
             weeklyDataEl.appendChild(weeklyDivEl)
         });
+        weekDayH2.textContent = `${count}-Days Weather`;
     }).catch((error)=>{
         errorFunction();
     })
@@ -476,42 +509,8 @@ function renderData(locationName){
         weatherTodayEl.appendChild(document.createTextNode(`Feels like : ${tempRangeData}°C`));
         todayEl.appendChild(spanTodayEl);
         todayEl.appendChild(weatherTodayEl);
-
-        // //sunrise-sunset
-        // let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
-        // let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
-        // console.log(sunriseTiming,sunsetTiming);
-        // //sun-moon
-        // let moonIcon = document.querySelector("#moon-fa-moon");
-        // let sunIcon = document.querySelector("#sun-fa-sun");
-        // let dateT = new Date()
-        // dateTime = dateT.toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" });
-        // if(dateTime>sunsetTiming){
-        //     sunSectionEl.style.backgroundColor = '#213131';
-        //     moonIcon.style.display = 'block';
-        //     sunIcon.style.display = 'none';
-        //     moonIcon.style.color = "#FFF";
-        //     sunStripEl.style.backgroundColor = '#fdfefd';
-        //     sunSectionEl.style.color = '#fff';
-        //     sunTimingEl.style.flexDirection = 'row-reverse';
-        // }
-        // else{
-        //     sunSectionEl.style.backgroundColor = '#fff';
-        //     sunSectionEl.style.color = '#000';
-        //     moonIcon.style.display = 'none';
-        //     sunIcon.style.display = 'block';
-        //     sunStripEl.style.backgroundColor = '#f8f85c';
-        //     sunSectionEl.style.color = '#000';
-        //     sunTimingEl.style.flexDirection = 'row';
-        // }
-        // //sun-timing
-        // let sunriseEl = document.createElement('p')
-        // sunriseEl.appendChild(document.createTextNode(`Sunrise : ${sunriseTiming}`))
-        // let sunsetEl = document.createElement('p')
-        // sunsetEl.appendChild(document.createTextNode(`Sunset : ${sunsetTiming}`))
-        // sunTimingEl.appendChild(sunriseEl)
-        // sunTimingEl.appendChild(sunsetEl)
-
+        //location-el
+        locationNameEl.textContent = `${data['location']['name']} , ${data['location']['country']}`
         //Container
         //wind-data
         let headingWind = document.createElement("p");
@@ -627,14 +626,15 @@ function renderData(locationName){
         uvIndexParentEl.appendChild(headingUvI)
         uvIndexParentEl.appendChild(uvDataEl)
         uvIndexParentEl.appendChild(uvRangeEl)
-
+        count = 0
         //weekly-data
         data['forecast']['forecastday'].forEach((dataQ)=> {
             console.log(dataQ);
             //parent-div
-            let weeklyDivEl = document.createElement("div")
+            let weeklyDivEl = document.createElement("div");
+            count += 1;
             //p-element
-            let weekDayEl = document.createElement("p")
+            let weekDayEl = document.createElement("p");
             const dateString = dataQ["date"];
             const date = new Date(dateString);
             const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -654,6 +654,7 @@ function renderData(locationName){
             weeklyDivEl.appendChild(weekTempEl)
             weeklyDataEl.appendChild(weeklyDivEl)
         });
+        weekDayH2.textContent = `${count}-Days Weather`;
     }).catch((err)=>{
         errorFunction();
         console.error(err);
