@@ -320,12 +320,13 @@ navigator.geolocation.getCurrentPosition((position)=>{
 
             return `${hours}:${paddedMinutes} ${period}`;
         }
+       
         let currentTime = toMinutes(getCurrentTime12hr());
         let sunsetTimeMinutes = toMinutes(sunsetTiming);
-        let n = subtractTimes(sunriseTiming,sunsetTiming);
+        let nDay = subtractTimes(sunriseTiming,sunsetTiming);
+        let nNight = subtractTimes(sunsetTiming,sunriseTiming)
         let sunsetWidth = subtractTimes(sunsetTiming,dateTime);
         let sunriseWidth = subtractTimes(sunriseTiming,dateTime);
-        // console.log(n,sunStripWidth,sunriseWidth,sunsetWidth,currentTime,sunsetTimeMinutes);
         if(currentTime>=sunsetTimeMinutes){
             sunSectionEl.style.backgroundColor = '#113131';
             moonIcon.style.display = 'block';
@@ -334,7 +335,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
             sunStripEl.style.backgroundColor = '#fd91f0';
             sunSectionEl.style.color = '#fff';
             sunTimingEl.style.flexDirection = 'row-reverse';
-            let leftNightPosition = (sunStripWidth/n)*sunsetWidth + 8;
+            let leftNightPosition = (sunStripWidth/nNight)*sunsetWidth + 8;
             console.log(leftNightPosition);
             moonIcon.style.left = `${leftNightPosition}px`;
         }
@@ -346,7 +347,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
             sunStripEl.style.backgroundColor = '#f8f85c';
             sunSectionEl.style.color = '#000';
             sunTimingEl.style.flexDirection = 'row';
-            let leftDayPosition = (sunStripWidth/n)*sunriseWidth + 4;
+            let leftDayPosition = (sunStripWidth/nDay)*sunriseWidth + 4;
             sunIcon.style.left = `${leftDayPosition}px`;
         }
         let sunriseDivEl = document.createElement("div")
