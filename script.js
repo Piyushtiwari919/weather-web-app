@@ -27,11 +27,12 @@ const sunTimingEl = document.querySelector(".sunrise-sunset-timing")
 let errorDiv = document.querySelector(".error-div-parent")
 let locationErrorEl = document.querySelector(".location-error-parent")
 const footerEl = document.querySelector("footer")
+let locationErrorMessage = ''
 
 let aqiDataArray = ["Particulate Matter","Particulate Matter","Sulphur Dioxide",'Carbon Monoxide','Nitrogen Dioxide','Ozone']
 let aqiDataArrayshort = ['PM2.5','PM10','SO2','CO','NO2','O3']
 let aqiRenderArray = ['pm2_5','pm10','so2','co','no2','o3']
-function locationError(){
+function locationError(errorMsg){
     footerEl.style.position = 'absolute'
     footerEl.style.bottom = 0;
     footerEl.style.right= 0;
@@ -47,10 +48,11 @@ function locationError(){
         locationErrorEl.style.display = 'flex';
     } else {
         locationErrorEl.style.display = 'flex';
-
+        let locationErrorH2 = document.createElement("h2")
+        locationErrorH2.textContent = 'Location Error';
         let errorEl = document.createElement("p");
-        errorEl.textContent = "We couldn't access your location. Make sure location services are turned ON in your phone's settings, then reload the page.";
-
+        errorEl.textContent = `${errorMsg}`;
+        locationErrorEl.appendChild(locationErrorH2)
         locationErrorEl.appendChild(errorEl);
     }
 
@@ -401,14 +403,17 @@ navigator.geolocation.getCurrentPosition((position)=>{
 },
   (error) => {
     if (error.code === error.PERMISSION_DENIED) {
-      alert("Location access is needed for weather info. Please enable location.");
-      locationError();
+        alert("Location access is needed for weather info. Please enable location.");
+        locationErrorMessage = 'Location access is needed for weather info. Please enable location';
+        locationError(locationErrorMessage);
     } else if (error.code === error.POSITION_UNAVAILABLE) {
-      alert("Location is unavailable. Please turn on your device's location services.");
-      locationError();
+        alert("Location is unavailable. Please turn on your device's location services.");
+        locationErrorMessage = "Location is unavailable. Please turn on your device's location services";
+        locationError(locationErrorMessage);
     } else {
-      alert("An error occurred: " + error.message);
-      locationError();
+        alert("An error occurred: " + error.message);
+        locationErrorMessage = `An error Occured: ${error.message}`;
+        locationError(locationErrorMessage);
     }
   }
 )
