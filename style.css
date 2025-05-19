@@ -313,3 +313,6 @@ footer .footer-div{
     justify-content: center;
     align-items: center;
 }
+.location-error-parent h2{
+    font-size: 2rem;
+}
