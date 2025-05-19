@@ -77,6 +77,7 @@ function errorFunction(){
         errorDiv.appendChild(errorEl2)
     }
 };
+
 fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature").then((res)=>{
     if(!res.ok){
         throw new Error("Failed to load Image");
@@ -84,16 +85,12 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
     return res.json()
 }).then((data)=>{
     let imgUnsplash = document.createElement("img")
-    if(data){
-        imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`)
-    }
-    else{
-        imgUnsplash.setAttribute("src",'https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDQ2MTkyMDh8&ixlib=rb-4.0.3&q=85')
-    }
+    imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`)
     unsplashImgParent.appendChild(imgUnsplash)
     
 }).catch((error)=>{
-    document.body.style.backgroundImage = `url(https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDQ2MTkyMDh8&ixlib=rb-4.0.3&q=85)`
+    imgUnsplash.setAttribute("src",'https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDQ2MTkyMDh8&ixlib=rb-4.0.3&q=85')
+    unsplashImgParent.appendChild(imgUnsplash)
 });
 
 navigator.geolocation.getCurrentPosition((position)=>{
