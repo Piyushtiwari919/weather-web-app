@@ -302,9 +302,9 @@ navigator.geolocation.getCurrentPosition((position)=>{
 
             // Compare current time with sunrise time (in minutes)
             if (currentMinutes < sunriseMinutes) {
-                sunriseT = true;
-            } else {
                 sunriseT = false;
+            } else {
+                sunriseT = true;
                 console.log("Current time is later than sunrise. No task executed.");
             }
         }
