@@ -463,7 +463,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
 
 //function-render
 function renderData(locationName){
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${locationName}&days=7&aqi=yes`)
+    fetch(`https://api.weatherapi.com/v1/forecast.json?key=2e6ca350b5bc4b49a14155929252005&q=${locationName}&days=7&aqi=yes`)
     .then((res)=>{
         if(!res.ok){
             throw new Error("This Location Data not available")
