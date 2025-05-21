@@ -97,7 +97,7 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
 
 navigator.geolocation.getCurrentPosition((position)=>{
     console.log(position);
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=c44d33c70e474799992132141250505&q=${position.coords.latitude},${position.coords.longitude}&days=7&aqi=yes`)
+    fetch(`https://api.weatherapi.com/v1/forecast.json?key=2e6ca350b5bc4b49a14155929252005&q=${position.coords.latitude},${position.coords.longitude}&days=7&aqi=yes`)
     .then((res)=>{
         if(!res.ok){
             throw new Error("This location data is not available")
