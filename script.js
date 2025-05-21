@@ -128,7 +128,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
                     divAqiData.style.backgroundColor = '#ee7777';
                 }
                 else if(aqiValueData>50){
-                    divAqiData.style.backgroundColor = '#dc7a8a';
+                    divAqiData.style.backgroundColor = '#f58b9c';
                 }
                 
                 aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
@@ -494,7 +494,7 @@ function renderData(locationName){
                     divAqiData.style.backgroundColor = '#ee7777';
                 }
                 else if(aqiValueData>50){
-                    divAqiData.style.backgroundColor = '#dc7a8a';
+                    divAqiData.style.backgroundColor = '#f58b9c';
                 }
                 
                 aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
