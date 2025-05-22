@@ -227,7 +227,7 @@ body{
 }
 
 /*--- Surise and Sunset Section ---*/
-.sunrise-sunset-section{
+/* .sunrise-sunset-section{
     margin-top: 1em;
     min-height:200px;
     border-radius: 5px;
@@ -264,7 +264,7 @@ body{
     justify-content: space-between;
     margin:1em;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
+} */
 
 /*Aqi Section*/
 .aqi-data-section{
@@ -320,7 +320,7 @@ footer .footer-div{
 .link-section a{
     text-decoration: none;
     color:#fff;
-    margin:0.5em 1em 0.5em 1em;
+    margin:0.5em 1.1em 0.5em 1.1em;
 }
 
 /* error styling */
