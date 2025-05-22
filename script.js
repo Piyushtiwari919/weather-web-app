@@ -938,7 +938,7 @@ searchBtn.addEventListener("click",()=>{
                 weeklyDataEl.removeChild(weeklyDataEl.firstChild)
             }
         }
-        sunSectionEl.style.display = 'none';
+        // sunSectionEl.style.display = 'none';
         inputSearch.value='';
         airQualityEl.replaceChildren();
         //render-function
