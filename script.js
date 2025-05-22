@@ -182,14 +182,15 @@ navigator.geolocation.getCurrentPosition((position)=>{
         inputSearch.addEventListener("input",()=>{
             let query = inputSearch.value;
             // console.log(query);
-            searchResults.style.display = 'block';
             if(query == ''){
                 searchResults.innerHTML = '';
                 searchResults.style.display = 'none';
             }
             else{
                 let results = filteredArray(query);
-                console.log(results);
+                if(results.length>0){
+                    searchResults.style.display = 'block';
+                }
                 displayNames(results)
             }
         })
