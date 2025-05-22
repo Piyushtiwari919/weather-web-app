@@ -7,6 +7,7 @@ const weeklyDataEl = document.querySelector(".weekly-data")
 const todayHighlights = document.querySelector("today-highlights")
 const unsplashImgParent = document.querySelector(".img-unsplash")
 const inputSearch = document.querySelector(".input-search")
+const searchResults = document.querySelector(".search-results");
 const searchBtn = document.querySelector(".weather-search-btn")
 const todayDataH2 = document.querySelector(".today-weather-h2")
 const windParentEl = document.querySelector(".today-wind")
@@ -16,8 +17,9 @@ const visibilityParentEl = document.querySelector(".today-visibility")
 const locationNameEl = document.querySelector(".location-name");
 let weekDayH2 = document.querySelector(".week-info");
 let count = 0 ;
-const rainParentEl = document.querySelector(".today-rain")
-const uvIndexParentEl = document.querySelector(".today-uv-index")
+let citiesNames;
+const rainParentEl = document.querySelector(".today-rain");
+const uvIndexParentEl = document.querySelector(".today-uv-index");
 const airQualityEl = document.querySelector(".air-quality-data")
 const aqiSection = document.querySelector(".aqi-data-section")
 const sunSectionEl = document.querySelector(".sunrise-sunset-section")
@@ -27,12 +29,11 @@ const sunTimingEl = document.querySelector(".sunrise-sunset-timing")
 let errorDiv = document.querySelector(".error-div-parent")
 let locationErrorEl = document.querySelector(".location-error-parent")
 const footerEl = document.querySelector("footer")
-let locationErrorMessage = ''
 
 let aqiDataArray = ["Particulate Matter","Particulate Matter","Sulphur Dioxide",'Carbon Monoxide','Nitrogen Dioxide','Ozone']
 let aqiDataArrayshort = ['PM2.5','PM10','SO2','CO','NO2','O3']
 let aqiRenderArray = ['pm2_5','pm10','so2','co','no2','o3']
-function locationError(errorMsg){
+function locationError(){
     footerEl.style.position = 'absolute'
     footerEl.style.bottom = 0;
     footerEl.style.right= 0;
@@ -51,7 +52,7 @@ function locationError(errorMsg){
         let locationErrorH2 = document.createElement("h2")
         locationErrorH2.textContent = 'Location Error';
         let errorEl = document.createElement("p");
-        errorEl.textContent = `${errorMsg}`;
+        errorEl.textContent = "We couldn't access your location. Make sure location services are turned ON in your phone's settings, then reload the page.";
         locationErrorEl.appendChild(locationErrorH2)
         locationErrorEl.appendChild(errorEl);
     }
@@ -79,18 +80,18 @@ function errorFunction(){
         errorDiv.appendChild(errorEl2)
     }
 };
-
 fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature").then((res)=>{
     if(!res.ok){
         throw new Error("Failed to load Image");
     }
-    return res.json()
+    return res.json();
 }).then((data)=>{
-    let imgUnsplash = document.createElement("img")
-    imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`)
+    let imgUnsplash = document.createElement("img");
+    imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`);
     unsplashImgParent.appendChild(imgUnsplash)
     
 }).catch((error)=>{
+    let imgUnsplash = document.createElement("img")
     imgUnsplash.setAttribute("src",'https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDQ2MTkyMDh8&ixlib=rb-4.0.3&q=85')
     unsplashImgParent.appendChild(imgUnsplash)
 });
@@ -113,7 +114,95 @@ navigator.geolocation.getCurrentPosition((position)=>{
         aqiSection.style.display = 'block';
         errorDiv.style.display='none';
         locationErrorEl.style.display = 'none';
-        //for-AirQuality
+        //search-reults-li
+        const getCitiesNames = async (country) => {
+            try {
+                const response = await fetch("https://countriesnow.space/api/v0.1/countries/cities", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                    body: JSON.stringify({ country })
+                });
+
+                if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error("API Error:", data.msg);
+                return;
+                }
+                citiesNames=data.data;
+            }
+            catch (error) {
+                console.error("Fetch error:", error.message);
+            }
+        };
+        getCitiesNames(data['location']['country']);
+        function displayNames(results){
+            searchResults.innerHTML = ''
+            if(results.length>10){
+                for(let i=0;i<10;i++){
+                    let liEl = document.createElement('li')
+                    liEl.textContent = `${results[i]}`
+                    liEl.addEventListener("click",()=>{
+                        inputSearch.value = `${results[i]}`
+                        searchResults.innerHTML = ''
+                        searchResults.style.display = 'none';
+                    })
+                    searchResults.appendChild(liEl);
+                }
+            }
+            else{
+                for(let i=0;i<results.length;i++){
+                    let liEl = document.createElement('li');
+                    liEl.textContent = `${results[i]}`;
+                    liEl.addEventListener("click",()=>{
+                        inputSearch.value = `${results[i]}`
+                        searchResults.innerHTML = ''
+                        searchResults.style.display = 'none';
+                    })
+                    searchResults.appendChild(liEl);
+                }
+            }
+    
+        }
+        function filteredArray(query){
+            let t = citiesNames.filter((data)=>{
+                return data.toLowerCase().startsWith(query.toLowerCase());
+            })
+            if(t.length==0){
+                searchResults.style.display = 'none';
+            }
+            return t;
+        }
+        inputSearch.addEventListener("input",()=>{
+            let query = inputSearch.value;
+            // console.log(query);
+            searchResults.style.display = 'block';
+            if(query == ''){
+                searchResults.innerHTML = '';
+                searchResults.style.display = 'none';
+            }
+            else{
+                let results = filteredArray(query);
+                console.log(results);
+                displayNames(results)
+            }
+        })
+        document.addEventListener('click', (event) => {
+            let isClickInsideInput = event.target === inputSearch;
+            let isClickInsideResults = searchResults.contains(event.target);
+            if (!isClickInsideInput && !isClickInsideResults) {
+                searchResults.innerHTML = '';
+                searchResults.style.display = 'none';
+            }
+        });
+        
+        //for-Air-Quality
         for(let i = 0 ; i<6;i++){
             let divAqiData = document.createElement("div");
             divAqiData.className = 'div-aqi-data';
@@ -128,7 +217,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
                     divAqiData.style.backgroundColor = '#ee7777';
                 }
                 else if(aqiValueData>50){
-                    divAqiData.style.backgroundColor = '#f58b9c';
+                    divAqiData.style.backgroundColor = '#dc7a8a';
                 }
                 
                 aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
@@ -273,8 +362,9 @@ navigator.geolocation.getCurrentPosition((position)=>{
         else{
             uvRangeEl.appendChild(document.createTextNode('Extreme 🤕'))
         }
-        uvIndexParentEl.appendChild(uvDataEl);
-        uvIndexParentEl.appendChild(uvRangeEl);
+        uvIndexParentEl.appendChild(uvDataEl)
+        uvIndexParentEl.appendChild(uvRangeEl)
+        
         //sunrise-sunset
         let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
         let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
@@ -446,17 +536,14 @@ navigator.geolocation.getCurrentPosition((position)=>{
 },
   (error) => {
     if (error.code === error.PERMISSION_DENIED) {
-        alert("Location access is needed for weather info. Please enable location.");
-        locationErrorMessage = 'Location access is needed for weather info. Please enable location';
-        locationError(locationErrorMessage);
+      alert("Location access is needed for weather info. Please enable location.");
+      locationError();
     } else if (error.code === error.POSITION_UNAVAILABLE) {
-        alert("Location is unavailable. Please turn on your device's location services.");
-        locationErrorMessage = "Location is unavailable. Please turn on your device's location services";
-        locationError(locationErrorMessage);
+      alert("Location is unavailable. Please turn on your device's location services.");
+      locationError();
     } else {
-        alert("An error occurred: " + error.message);
-        locationErrorMessage = `An error Occured: ${error.message}`;
-        locationError(locationErrorMessage);
+      alert("An error occurred: " + error.message);
+      locationError();
     }
   }
 )
@@ -471,6 +558,97 @@ function renderData(locationName){
         return res.json();
     }).then((data)=>{
         console.log(data);
+        //search-reults-li
+        
+        const getCitiesNames = async (country) => {
+            try {
+                const response = await fetch("https://countriesnow.space/api/v0.1/countries/cities", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                    body: JSON.stringify({ country })
+                });
+
+                if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    console.error("API Error:", data.msg);
+                return;
+                }
+
+                citiesNames=data.data;
+                
+            }
+            catch (error) {
+                console.error("Fetch error:", error.message);
+            }
+        };
+        getCitiesNames(data['location']['country']);
+        function displayNames(results){
+            searchResults.innerHTML = ''
+            if(results.length>8){
+                for(let i=0;i<8;i++){
+                    let liEl = document.createElement('li')
+                    liEl.textContent = `${results[i]}`
+                    liEl.addEventListener("click",()=>{
+                        inputSearch.value = `${results[i]}`
+                        searchResults.innerHTML = ''
+                        searchResults.style.display = 'none';
+                    })
+                    searchResults.appendChild(liEl);
+                }
+            }
+            else{
+                for(let i=0;i<results.length;i++){
+                    let liEl = document.createElement('li')
+                    liEl.textContent = `${results[i]}`
+                    liEl.addEventListener("click",()=>{
+                        inputSearch.value = `${results[i]}`
+                        searchResults.innerHTML = ''
+                        searchResults.style.display = 'none';
+                    })
+                    searchResults.appendChild(liEl);
+                }
+            }
+    
+        }
+        function filteredArray(query){
+            let t = citiesNames.filter((data)=>{
+                return data.toLowerCase().startsWith(query.toLowerCase());
+            })
+            if(t.length==0){
+                searchResults.style.display = 'none';
+            }
+            return t;
+        }
+        inputSearch.addEventListener("input",()=>{
+            let query = inputSearch.value;
+            console.log(query);
+            searchResults.style.display = 'block';
+            if(query == ''){
+                searchResults.innerHTML = '';
+                searchResults.style.display = 'none';
+            }
+            else{
+                let results = filteredArray(query);
+                console.log(results);
+                displayNames(results)
+            }
+        })
+        document.addEventListener('click', (event) => {
+            let isClickInsideInput = event.target === inputSearch;
+            let isClickInsideResults = searchResults.contains(event.target);
+            if (!isClickInsideInput && !isClickInsideResults) {
+                searchResults.innerHTML = '';
+                searchResults.style.display = 'none';
+            }
+        });
+        
         //weather-data
         footerEl.style.position = "static";
         weatherToday.style.display="flex";
@@ -494,7 +672,7 @@ function renderData(locationName){
                     divAqiData.style.backgroundColor = '#ee7777';
                 }
                 else if(aqiValueData>50){
-                    divAqiData.style.backgroundColor = '#f58b9c';
+                    divAqiData.style.backgroundColor = '#dc7a8a';
                 }
                 
                 aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
@@ -766,4 +944,3 @@ searchBtn.addEventListener("click",()=>{
         renderData(locationName)
     }
 })
-
