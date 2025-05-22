@@ -106,7 +106,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
         return res.json()
     }).then((data)=>{
         console.log(data);
-        sunSectionEl.style.display = 'block';
+        // sunSectionEl.style.display = 'block';
         //For-Allocation
         footerEl.style.position = "static";
         weatherToday.style.display="flex";
