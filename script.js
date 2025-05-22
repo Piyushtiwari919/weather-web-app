@@ -22,10 +22,10 @@ const rainParentEl = document.querySelector(".today-rain");
 const uvIndexParentEl = document.querySelector(".today-uv-index");
 const airQualityEl = document.querySelector(".air-quality-data")
 const aqiSection = document.querySelector(".aqi-data-section")
-const sunSectionEl = document.querySelector(".sunrise-sunset-section")
-const sunStripEl = document.querySelector(".sun-strip-div")
-const sunDataEl = document.querySelector(".sun-data-div")
-const sunTimingEl = document.querySelector(".sunrise-sunset-timing")
+// const sunSectionEl = document.querySelector(".sunrise-sunset-section")
+// const sunStripEl = document.querySelector(".sun-strip-div")
+// const sunDataEl = document.querySelector(".sun-data-div")
+// const sunTimingEl = document.querySelector(".sunrise-sunset-timing")
 let errorDiv = document.querySelector(".error-div-parent")
 let locationErrorEl = document.querySelector(".location-error-parent")
 const footerEl = document.querySelector("footer")
@@ -366,143 +366,144 @@ navigator.geolocation.getCurrentPosition((position)=>{
         uvIndexParentEl.appendChild(uvRangeEl)
         
         //sunrise-sunset
-        let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
-        let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
-        console.log(sunriseTiming,sunsetTiming);
-        //sun-moon
-        let moonIcon = document.querySelector("#moon-fa-moon");
-        let sunIcon = document.querySelector("#sun-fa-sun");
-        let dateT = new Date()
-        let sunriseT = false;
-        dateTime = dateT.toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" });
-        let sunStripWidth = sunStripEl.getBoundingClientRect().width
-        console.log(Math.floor(sunStripWidth));
-        // Function to check if current time is before sunrise
-        function checkTimeAndExecute(sunriseTime) {
-            // Get current time
-            let currentTime = new Date();
-            let currentFormattedTime = formatTime(currentTime);
+        /*
+        // let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
+        // let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
+        // console.log(sunriseTiming,sunsetTiming);
+        // //sun-moon
+        // let moonIcon = document.querySelector("#moon-fa-moon");
+        // let sunIcon = document.querySelector("#sun-fa-sun");
+        // let dateT = new Date()
+        // let sunriseT = false;
+        // dateTime = dateT.toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" });
+        // let sunStripWidth = sunStripEl.getBoundingClientRect().width
+        // console.log(Math.floor(sunStripWidth));
+        // // Function to check if current time is before sunrise
+        // function checkTimeAndExecute(sunriseTime) {
+        //     // Get current time
+        //     let currentTime = new Date();
+        //     let currentFormattedTime = formatTime(currentTime);
 
-            console.log("Current time: " + currentFormattedTime);
-            console.log("Sunrise time: " + sunriseTime);
+        //     console.log("Current time: " + currentFormattedTime);
+        //     console.log("Sunrise time: " + sunriseTime);
 
-            // Convert the sunrise time (e.g., '6:30 AM') to a comparable time in minutes
-            let sunriseMinutes = convertToMinutes(sunriseTime, currentTime);
-            let currentMinutes = convertToMinutes(currentFormattedTime, currentTime);
+        //     // Convert the sunrise time (e.g., '6:30 AM') to a comparable time in minutes
+        //     let sunriseMinutes = convertToMinutes(sunriseTime, currentTime);
+        //     let currentMinutes = convertToMinutes(currentFormattedTime, currentTime);
 
-            // Compare current time with sunrise time (in minutes)
-            if (currentMinutes < sunriseMinutes) {
-                sunriseT = false;
-            } else {
-                sunriseT = true;
-                console.log("Current time is later than sunrise. No task executed.");
-            }
-        }
+        //     // Compare current time with sunrise time (in minutes)
+        //     if (currentMinutes < sunriseMinutes) {
+        //         sunriseT = false;
+        //     } else {
+        //         sunriseT = true;
+        //         console.log("Current time is later than sunrise. No task executed.");
+        //     }
+        // }
 
-        // Function to format time from Date object to 'HH:mm' format (e.g., '06:30')
-        function formatTime(date) {
-            let hours = date.getHours();
-            let minutes = date.getMinutes();
-            return (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-        }
+        // // Function to format time from Date object to 'HH:mm' format (e.g., '06:30')
+        // function formatTime(date) {
+        //     let hours = date.getHours();
+        //     let minutes = date.getMinutes();
+        //     return (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+        // }
 
-        // Function to convert time from '6:30 AM' or '6:30 PM' format to minutes since midnight
-        function convertToMinutes(time, currentTime) {
-            let [timePart, period] = time.split(' ');  // Split the time part from AM/PM
-            let [hours, minutes] = timePart.split(':').map(num => parseInt(num));
+        // // Function to convert time from '6:30 AM' or '6:30 PM' format to minutes since midnight
+        // function convertToMinutes(time, currentTime) {
+        //     let [timePart, period] = time.split(' ');  // Split the time part from AM/PM
+        //     let [hours, minutes] = timePart.split(':').map(num => parseInt(num));
 
-            // Convert 12-hour format to 24-hour format based on AM/PM
-            if (period === 'PM' && hours !== 12) {
-                hours += 12;  // Convert PM hours to 24-hour format
-            } else if (period === 'AM' && hours === 12) {
-                hours = 0;  // Convert 12 AM to 00:00 (midnight)
-            }
+        //     // Convert 12-hour format to 24-hour format based on AM/PM
+        //     if (period === 'PM' && hours !== 12) {
+        //         hours += 12;  // Convert PM hours to 24-hour format
+        //     } else if (period === 'AM' && hours === 12) {
+        //         hours = 0;  // Convert 12 AM to 00:00 (midnight)
+        //     }
 
-            // If the current time is after midnight and before sunrise, consider sunrise as the next day
-            let sunriseDate = new Date(currentTime);
-            sunriseDate.setHours(hours);
-            sunriseDate.setMinutes(minutes);
-            sunriseDate.setSeconds(0);
+        //     // If the current time is after midnight and before sunrise, consider sunrise as the next day
+        //     let sunriseDate = new Date(currentTime);
+        //     sunriseDate.setHours(hours);
+        //     sunriseDate.setMinutes(minutes);
+        //     sunriseDate.setSeconds(0);
 
-            // If current time is after midnight and the sunrise time is earlier, adjust the sunrise to the next day
-            if (currentTime.getHours() < hours || (currentTime.getHours() === hours && currentTime.getMinutes() < minutes)) {
-                sunriseDate.setDate(sunriseDate.getDate() + 1);  // Move sunrise to the next day
-            }
+        //     // If current time is after midnight and the sunrise time is earlier, adjust the sunrise to the next day
+        //     if (currentTime.getHours() < hours || (currentTime.getHours() === hours && currentTime.getMinutes() < minutes)) {
+        //         sunriseDate.setDate(sunriseDate.getDate() + 1);  // Move sunrise to the next day
+        //     }
 
-            return sunriseDate.getHours() * 60 + sunriseDate.getMinutes();  // Convert the time to total minutes since midnight
-        }
-        checkTimeAndExecute(sunriseTiming);
-        function toMinutes(timeStr) {
-            let [time, period] = timeStr.split(' ');
-            let [hours, minutes] = time.split(':').map(Number);
+        //     return sunriseDate.getHours() * 60 + sunriseDate.getMinutes();  // Convert the time to total minutes since midnight
+        // }
+        // checkTimeAndExecute(sunriseTiming);
+        // function toMinutes(timeStr) {
+        //     let [time, period] = timeStr.split(' ');
+        //     let [hours, minutes] = time.split(':').map(Number);
 
-            if (period === 'PM' && hours !== 12) {
-                hours += 12;
-            } else if (period === 'AM' && hours === 12) {
-                hours = 0;
-            }
-            return hours * 60 + minutes;
-        }
-        function subtractTimes(startStr, endStr) {
-            let startMin = toMinutes(startStr);
-            let endMin = toMinutes(endStr);
-            if (endMin < startMin) {
-                endMin += 24 * 60;
-            }
-            let diff = endMin - startMin;
-            // let hours = Math.floor(diff / 60);
-            // let minutes = diff % 60;
-            return(diff/60)
-        }
-        let nDay = subtractTimes(sunriseTiming,sunsetTiming);
-        let nNight = subtractTimes(sunsetTiming,sunriseTiming)
-        let sunsetWidth = subtractTimes(sunsetTiming,dateTime);
-        let sunriseWidth = subtractTimes(sunriseTiming,dateTime);
-        console.log(nDay,nNight,sunStripWidth,sunriseWidth,sunsetWidth);
+        //     if (period === 'PM' && hours !== 12) {
+        //         hours += 12;
+        //     } else if (period === 'AM' && hours === 12) {
+        //         hours = 0;
+        //     }
+        //     return hours * 60 + minutes;
+        // }
+        // function subtractTimes(startStr, endStr) {
+        //     let startMin = toMinutes(startStr);
+        //     let endMin = toMinutes(endStr);
+        //     if (endMin < startMin) {
+        //         endMin += 24 * 60;
+        //     }
+        //     let diff = endMin - startMin;
+        //     // let hours = Math.floor(diff / 60);
+        //     // let minutes = diff % 60;
+        //     return(diff/60)
+        // }
+        // let nDay = subtractTimes(sunriseTiming,sunsetTiming);
+        // let nNight = subtractTimes(sunsetTiming,sunriseTiming)
+        // let sunsetWidth = subtractTimes(sunsetTiming,dateTime);
+        // let sunriseWidth = subtractTimes(sunriseTiming,dateTime);
+        // console.log(nDay,nNight,sunStripWidth,sunriseWidth,sunsetWidth);
         
         
 
 
-        if(sunriseT){
-            sunSectionEl.style.backgroundColor = '#113131';
-            moonIcon.style.display = 'block';
-            sunIcon.style.display = 'none';
-            moonIcon.style.color = "#FFF";
-            sunStripEl.style.backgroundColor = '#fd91f0';
-            sunSectionEl.style.color = '#fff';
-            sunTimingEl.style.flexDirection = 'row-reverse';
-            let leftNightPosition = (sunStripWidth/nNight)*sunsetWidth + 8;
-            console.log(leftNightPosition);
-            moonIcon.style.left = `${leftNightPosition}px`;
-        }
-        else{
-            sunSectionEl.style.backgroundColor = '#fff';
-            sunSectionEl.style.color = '#000';
-            moonIcon.style.display = 'none';
-            sunIcon.style.display = 'block';
-            sunStripEl.style.backgroundColor = '#f8f85c';
-            sunSectionEl.style.color = '#000';
-            sunTimingEl.style.flexDirection = 'row';
-            let leftDayPosition = (sunStripWidth/nDay)*sunriseWidth + 4;
-            sunIcon.style.left = `${leftDayPosition}px`;
-        }
-        let sunriseDivEl = document.createElement("div")
-        let sunsetDivEl = document.createElement('div')
-        let sunriseEl = document.createElement('p')
-        sunriseEl.appendChild(document.createTextNode(`Sunrise : ${sunriseTiming}`))
-        let sunriseImgEl = document.createElement('img')
-        sunriseImgEl.setAttribute('src','sunrise-org.png')
-        let sunsetEl = document.createElement('p')
-        sunsetEl.appendChild(document.createTextNode(`Sunset : ${sunsetTiming}`))
-        let sunsetImgEl = document.createElement('img');
-        sunsetImgEl.setAttribute('src','sunset-org.png')
-        sunriseDivEl.appendChild(sunriseEl)
-        sunriseDivEl.appendChild(sunriseImgEl)
-        sunsetDivEl.appendChild(sunsetEl)
-        sunsetDivEl.appendChild(sunsetImgEl)
-        sunTimingEl.appendChild(sunriseDivEl)
-        sunTimingEl.appendChild(sunsetDivEl)
-        
+        // if(sunriseT){
+        //     sunSectionEl.style.backgroundColor = '#113131';
+        //     moonIcon.style.display = 'block';
+        //     sunIcon.style.display = 'none';
+        //     moonIcon.style.color = "#FFF";
+        //     sunStripEl.style.backgroundColor = '#fd91f0';
+        //     sunSectionEl.style.color = '#fff';
+        //     sunTimingEl.style.flexDirection = 'row-reverse';
+        //     let leftNightPosition = (sunStripWidth/nNight)*sunsetWidth + 8;
+        //     console.log(leftNightPosition);
+        //     moonIcon.style.left = `${leftNightPosition}px`;
+        // }
+        // else{
+        //     sunSectionEl.style.backgroundColor = '#fff';
+        //     sunSectionEl.style.color = '#000';
+        //     moonIcon.style.display = 'none';
+        //     sunIcon.style.display = 'block';
+        //     sunStripEl.style.backgroundColor = '#f8f85c';
+        //     sunSectionEl.style.color = '#000';
+        //     sunTimingEl.style.flexDirection = 'row';
+        //     let leftDayPosition = (sunStripWidth/nDay)*sunriseWidth + 4;
+        //     sunIcon.style.left = `${leftDayPosition}px`;
+        // }
+        // let sunriseDivEl = document.createElement("div")
+        // let sunsetDivEl = document.createElement('div')
+        // let sunriseEl = document.createElement('p')
+        // sunriseEl.appendChild(document.createTextNode(`Sunrise : ${sunriseTiming}`))
+        // let sunriseImgEl = document.createElement('img')
+        // sunriseImgEl.setAttribute('src','sunrise-org.png')
+        // let sunsetEl = document.createElement('p')
+        // sunsetEl.appendChild(document.createTextNode(`Sunset : ${sunsetTiming}`))
+        // let sunsetImgEl = document.createElement('img');
+        // sunsetImgEl.setAttribute('src','sunset-org.png')
+        // sunriseDivEl.appendChild(sunriseEl)
+        // sunriseDivEl.appendChild(sunriseImgEl)
+        // sunsetDivEl.appendChild(sunsetEl)
+        // sunsetDivEl.appendChild(sunsetImgEl)
+        // sunTimingEl.appendChild(sunriseDivEl)
+        // sunTimingEl.appendChild(sunsetDivEl)
+        */
         //weekly-data
         data['forecast']['forecastday'].forEach((dataQ)=> {
             console.log(dataQ);
