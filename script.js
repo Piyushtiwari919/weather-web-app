@@ -786,12 +786,12 @@ function renderData(locationName){
         humidityParentEl.appendChild(humidtyDataEl)
 
         //visibility-data
-        let headingVisibility = document.createElement("p")
-        headingVisibility.className = "highlights-heading"
-        headingVisibility.appendChild(document.createTextNode(`Visibility`))
+        let headingVisibility = document.createElement("p");
+        headingVisibility.className = "highlights-heading";
+        headingVisibility.innerHTML = `<i class="fa-solid fa-eye"></i> Visibility`;
         let visibiltyRangeEl = document.createElement("p")
-        let visibilityData = data["current"]["vis_km"]
-        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData} km`))
+        let visibilityData = data["current"]["vis_km"];
+        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData} km`));
         let visibilityDataEl = document.createElement("p")
         if(visibilityData>=10){
             visibilityDataEl.appendChild(document.createTextNode('Good 🙂'))
