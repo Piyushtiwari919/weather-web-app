@@ -507,7 +507,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
         */
         //weekly-data
         data['forecast']['forecastday'].forEach((dataQ)=> {
-            console.log(dataQ);
+            // remove the comment for o/p details:console.log(dataQ);
             count += 1;
             //parent-div
             let weeklyDivEl = document.createElement("div")
