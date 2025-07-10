@@ -105,7 +105,7 @@ navigator.geolocation.getCurrentPosition((position)=>{
         }
         return res.json()
     }).then((data)=>{
-        console.log(data);
+        // remove the comment for o/p details:console.log(data);
         // sunSectionEl.style.display = 'block';
         //For-Allocation
         footerEl.style.position = "static";
@@ -559,7 +559,7 @@ function renderData(locationName){
         }
         return res.json();
     }).then((data)=>{
-        console.log(data);
+        // remove the comment for o/p details:console.log(data);
         //search-reults-li
         
         const getCitiesNames = async (country) => {
@@ -638,7 +638,7 @@ function renderData(locationName){
             }
             else{
                 let results = filteredArray(query);
-                console.log(results);
+                // remove the comment for o/p details:console.log(results);
                 displayNames(results)
             }
         })
