@@ -14,7 +14,7 @@ Simple UI built make this website easy to use and flexible for many purposes.
 
 *Important tip : Turn on your location before using
 
-#Languages Used:
+Languages Used : 
 #JavaScript,
 #HTML,
 #CSS
