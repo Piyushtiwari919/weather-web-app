@@ -1,4 +1,5 @@
 ** Weather-Web-App**
+
 This is a weather web application used for displaying weather related data at your location. 
 Simple UI built make this website easy to use and flexible for many purposes.
 
