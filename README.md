@@ -13,7 +13,8 @@ Simple UI built make this website easy to use and flexible for many purposes.
 3.Also displaying AQI data make this app more useful for other outdoor activities like running, cycling,etc.
 
 *Important tip : Turn on your location before using
+
 #Languages Used:
-#JavaScript
-#HTML
+#JavaScript,
+#HTML,
 #CSS
