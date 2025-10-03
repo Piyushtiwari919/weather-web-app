@@ -180,7 +180,11 @@ body{
 }
 
 .weekly-data div {
-    
+    border-radius: 12px;
+    flex: 1 1 calc(33.333% - 16px);
+    padding: 16px;
+    text-align: center;
+    transition: transform 0.2s ease;
 }
 .weekly-data div:hover{
     background-color: #fdfefd;
@@ -342,4 +346,5 @@ footer .footer-div{
 .location-error-parent h2{
     font-size: 2rem;
 }
+
 
