@@ -45,7 +45,7 @@ function locationError(){
         errorDiv.style.display = 'none';
     }
     if (locationErrorEl.children.length) {
-        console.log('Location Error');
+        // console.log('Location Error');
         locationErrorEl.style.display = 'flex';
     } else {
         locationErrorEl.style.display = 'flex';
@@ -67,7 +67,7 @@ function errorFunction(){
     mainContainer.style.display="none";
     aqiSection.style.display = 'none';
     if(errorDiv.children.length){
-        console.log("try searching new location");
+        //console.log("try searching new location");
         errorDiv.style.display = "flex";
     }
     else{
@@ -97,7 +97,7 @@ fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&que
 });
 
 navigator.geolocation.getCurrentPosition((position)=>{
-    console.log(position);
+    //console.log(position);
     fetch(`https://api.weatherapi.com/v1/forecast.json?key=2e6ca350b5bc4b49a14155929252005&q=${position.coords.latitude},${position.coords.longitude}&days=7&aqi=yes`)
     .then((res)=>{
         if(!res.ok){
@@ -630,7 +630,7 @@ function renderData(locationName){
         }
         inputSearch.addEventListener("input",()=>{
             let query = inputSearch.value;
-            console.log(query);
+            // console.log(query);
             searchResults.style.display = 'block';
             if(query == ''){
                 searchResults.innerHTML = '';
@@ -855,7 +855,7 @@ function renderData(locationName){
         count = 0
         //weekly-data
         data['forecast']['forecastday'].forEach((dataQ)=> {
-            console.log(dataQ);
+            //console.log(dataQ);
             //parent-div
             let weeklyDivEl = document.createElement("div");
             count += 1;
@@ -946,3 +946,4 @@ searchBtn.addEventListener("click",()=>{
         renderData(locationName)
     }
 })
+
