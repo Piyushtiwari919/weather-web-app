@@ -1,4 +1,4 @@
-** Weather-Web-App**
+## Weather-Web-App
 
 This is a weather web application used for displaying weather related data at your location. 
 
