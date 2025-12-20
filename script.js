@@ -1,949 +1,460 @@
-//Start
-const weatherToday = document.querySelector(".weather-today")
-const weatherData = document.querySelector(".weather-data")
-const todayEl = document.querySelector(".today-el")
-const mainContainer = document.querySelector(".container")
-const weeklyDataEl = document.querySelector(".weekly-data")
-const todayHighlights = document.querySelector("today-highlights")
-const unsplashImgParent = document.querySelector(".img-unsplash")
-const inputSearch = document.querySelector(".input-search")
-const searchResults = document.querySelector(".search-results");
-const searchBtn = document.querySelector(".weather-search-btn")
-const todayDataH2 = document.querySelector(".today-weather-h2")
-const windParentEl = document.querySelector(".today-wind")
-const pressureParentEl = document.querySelector(".pressure-data")
-const humidityParentEl = document.querySelector(".today-humidity")
-const visibilityParentEl = document.querySelector(".today-visibility")
-const locationNameEl = document.querySelector(".location-name");
-let weekDayH2 = document.querySelector(".week-info");
-let count = 0 ;
-let citiesNames;
-const rainParentEl = document.querySelector(".today-rain");
-const uvIndexParentEl = document.querySelector(".today-uv-index");
-const airQualityEl = document.querySelector(".air-quality-data")
-const aqiSection = document.querySelector(".aqi-data-section")
-// const sunSectionEl = document.querySelector(".sunrise-sunset-section")
-// const sunStripEl = document.querySelector(".sun-strip-div")
-// const sunDataEl = document.querySelector(".sun-data-div")
-// const sunTimingEl = document.querySelector(".sunrise-sunset-timing")
-let errorDiv = document.querySelector(".error-div-parent")
-let locationErrorEl = document.querySelector(".location-error-parent")
-const footerEl = document.querySelector("footer")
+// Refactored script.js
+// Preserves original constant names (DO NOT rename these) and improves structure, error handling, and scalability.
 
-let aqiDataArray = ["Particulate Matter","Particulate Matter","Sulphur Dioxide",'Carbon Monoxide','Nitrogen Dioxide','Ozone']
-let aqiDataArrayshort = ['PM2.5','PM10','SO2','CO','NO2','O3']
-let aqiRenderArray = ['pm2_5','pm10','so2','co','no2','o3']
-function locationError(){
-    footerEl.style.position = 'absolute'
-    footerEl.style.bottom = 0;
-    footerEl.style.right= 0;
-    footerEl.style.left = 0;
-    weatherToday.style.display="none";
-    mainContainer.style.display="none";
-    aqiSection.style.display = 'none';
-    if (errorDiv.children.length) {
-        errorDiv.style.display = 'none';
-    }
-    if (locationErrorEl.children.length) {
-        // console.log('Location Error');
-        locationErrorEl.style.display = 'flex';
-    } else {
-        locationErrorEl.style.display = 'flex';
-        let locationErrorH2 = document.createElement("h2")
-        locationErrorH2.textContent = 'Location Error';
-        let errorEl = document.createElement("p");
-        errorEl.textContent = "We couldn't access your location. Make sure location services are turned ON in your phone's settings, then reload the page.";
-        locationErrorEl.appendChild(locationErrorH2)
-        locationErrorEl.appendChild(errorEl);
-    }
+(async function () {
+  'use strict';
 
-}
-function errorFunction(){
+  // --- DOM references (kept original names) ---
+  const weatherToday = document.querySelector('.weather-today');
+  const weatherData = document.querySelector('.weather-data');
+  const todayEl = document.querySelector('.today-el');
+  const mainContainer = document.querySelector('.container');
+  const weeklyDataEl = document.querySelector('.weekly-data');
+  const todayHighlights = document.querySelector('today-highlights');
+  const unsplashImgParent = document.querySelector('.img-unsplash');
+  const inputSearch = document.querySelector('.input-search');
+  const searchResults = document.querySelector('.search-results');
+  const searchBtn = document.querySelector('.weather-search-btn');
+  const todayDataH2 = document.querySelector('.today-weather-h2');
+  const windParentEl = document.querySelector('.today-wind');
+  const pressureParentEl = document.querySelector('.pressure-data');
+  const humidityParentEl = document.querySelector('.today-humidity');
+  const visibilityParentEl = document.querySelector('.today-visibility');
+  const locationNameEl = document.querySelector('.location-name');
+  let weekDayH2 = document.querySelector('.week-info');
+  let count = 0;
+  let citiesNames;
+  const rainParentEl = document.querySelector('.today-rain');
+  const uvIndexParentEl = document.querySelector('.today-uv-index');
+  const airQualityEl = document.querySelector('.air-quality-data');
+  const aqiSection = document.querySelector('.aqi-data-section');
+  let errorDiv = document.querySelector('.error-div-parent');
+  let locationErrorEl = document.querySelector('.location-error-parent');
+  const footerEl = document.querySelector('footer');
+
+  // Keep AQI labels constant names used in original app
+  const aqiDataArray = ['Particulate Matter', 'Particulate Matter', 'Sulphur Dioxide', 'Carbon Monoxide', 'Nitrogen Dioxide', 'Ozone'];
+  const aqiDataArrayshort = ['PM2.5', 'PM10', 'SO2', 'CO', 'NO2', 'O3'];
+  const aqiRenderArray = ['pm2_5', 'pm10', 'so2', 'co', 'no2', 'o3'];
+
+  // --- Config ---
+  const WEATHER_API_KEY = '2e6ca350b5bc4b49a14155929252005';
+  const WEATHER_BASE = 'https://api.weatherapi.com/v1/forecast.json';
+  const UNSPLASH_ENDPOINT = 'https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature';
+
+  // Request identity to ignore stale responses when multiple requests happen
+  let latestRequestId = 0;
+
+  // --- Utilities ---
+  function setFooterStatic() {
+    footerEl.style.position = 'static';
+  }
+  function setFooterAbsoluteBottom() {
     footerEl.style.position = 'absolute';
     footerEl.style.bottom = 0;
-    footerEl.style.right= 0;
+    footerEl.style.right = 0;
     footerEl.style.left = 0;
-    weatherToday.style.display="none";
-    mainContainer.style.display="none";
+  }
+
+  function clearChildren(el) {
+    if (!el) return;
+    // modern API
+    el.replaceChildren();
+  }
+
+  function createText(tag, text) {
+    const p = document.createElement(tag || 'p');
+    p.appendChild(document.createTextNode(String(text)));
+    return p;
+  }
+
+  function createIconHTML(html) {
+    const span = document.createElement('span');
+    span.innerHTML = html;
+    return span;
+  }
+
+  function showLocationError(message) {
+    setFooterAbsoluteBottom();
+    weatherToday.style.display = 'none';
+    mainContainer.style.display = 'none';
     aqiSection.style.display = 'none';
-    if(errorDiv.children.length){
-        //console.log("try searching new location");
-        errorDiv.style.display = "flex";
-    }
-    else{
-        errorDiv.style.display = "flex";
-        let errorEl1 = document.createElement("p")
-        let errorEl2 = document.createElement("p")
-        errorEl1.appendChild(document.createTextNode("Sorry! No Data Available"))
-        errorEl2.appendChild(document.createTextNode(`Try searching different location`))
-        errorDiv.appendChild(errorEl1)
-        errorDiv.appendChild(errorEl2)
-    }
-};
-fetch("https://apis.scrimba.com/unsplash/photos/random?orientation=landscape&query=nature").then((res)=>{
-    if(!res.ok){
-        throw new Error("Failed to load Image");
-    }
-    return res.json();
-}).then((data)=>{
-    let imgUnsplash = document.createElement("img");
-    imgUnsplash.setAttribute("src",`${data["urls"]["full"]}`);
-    unsplashImgParent.appendChild(imgUnsplash)
-    
-}).catch((error)=>{
-    let imgUnsplash = document.createElement("img")
-    imgUnsplash.setAttribute("src",'https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&ixid=M3wxNDI0NzB8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NDQ2MTkyMDh8&ixlib=rb-4.0.3&q=85')
-    unsplashImgParent.appendChild(imgUnsplash)
-});
+    errorDiv.style.display = 'none';
 
-navigator.geolocation.getCurrentPosition((position)=>{
-    //console.log(position);
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=2e6ca350b5bc4b49a14155929252005&q=${position.coords.latitude},${position.coords.longitude}&days=7&aqi=yes`)
-    .then((res)=>{
-        if(!res.ok){
-            throw new Error("This location data is not available")
-        }
-        return res.json()
-    }).then((data)=>{
-        // remove the comment for o/p details:console.log(data);
-        // sunSectionEl.style.display = 'block';
-        //For-Allocation
-        footerEl.style.position = "static";
-        weatherToday.style.display="flex";
-        mainContainer.style.display="block";
-        aqiSection.style.display = 'block';
-        errorDiv.style.display='none';
-        locationErrorEl.style.display = 'none';
-        //search-reults-li
-        const getCitiesNames = async (country) => {
-            try {
-                const response = await fetch("https://countriesnow.space/api/v0.1/countries/cities", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                    body: JSON.stringify({ country })
-                });
+    locationErrorEl.style.display = 'flex';
+    clearChildren(locationErrorEl);
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Location Error';
+    const p = document.createElement('p');
+    p.textContent = message || "We couldn't access your location. Make sure location services are turned ON in your device settings, then reload the page.";
+    locationErrorEl.appendChild(h2);
+    locationErrorEl.appendChild(p);
+  }
 
-                if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-                }
+  function showGenericError(message) {
+    setFooterAbsoluteBottom();
+    weatherToday.style.display = 'none';
+    mainContainer.style.display = 'none';
+    aqiSection.style.display = 'none';
 
-                const data = await response.json();
+    locationErrorEl.style.display = 'none';
+    errorDiv.style.display = 'flex';
+    clearChildren(errorDiv);
+    errorDiv.appendChild(createText('p', message || 'Sorry! No Data Available'));
+    errorDiv.appendChild(createText('p', 'Try searching a different location'));
+  }
 
-                if (data.error) {
-                    console.error("API Error:", data.msg);
-                return;
-                }
-                citiesNames=data.data;
-            }
-            catch (error) {
-                console.error("Fetch error:", error.message);
-            }
-        };
-        getCitiesNames(data['location']['country']);
-        function displayNames(results){
-            searchResults.innerHTML = ''
-            if(results.length>10){
-                for(let i=0;i<10;i++){
-                    let liEl = document.createElement('li')
-                    liEl.textContent = `${results[i]}`
-                    liEl.addEventListener("click",()=>{
-                        inputSearch.value = `${results[i]}`
-                        searchResults.innerHTML = ''
-                        searchResults.style.display = 'none';
-                    })
-                    searchResults.appendChild(liEl);
-                }
-            }
-            else{
-                for(let i=0;i<results.length;i++){
-                    let liEl = document.createElement('li');
-                    liEl.textContent = `${results[i]}`;
-                    liEl.addEventListener("click",()=>{
-                        inputSearch.value = `${results[i]}`
-                        searchResults.innerHTML = ''
-                        searchResults.style.display = 'none';
-                    })
-                    searchResults.appendChild(liEl);
-                }
-            }
-    
-        }
-        function filteredArray(query){
-            let t = citiesNames.filter((data)=>{
-                return data.toLowerCase().startsWith(query.toLowerCase());
-            })
-            if(t.length==0){
-                searchResults.style.display = 'none';
-            }
-            return t;
-        }
-        inputSearch.addEventListener("input",()=>{
-            let query = inputSearch.value;
-            // console.log(query);
-            if(query == ''){
-                searchResults.innerHTML = '';
-                searchResults.style.display = 'none';
-            }
-            else{
-                let results = filteredArray(query);
-                if(results.length>0){
-                    searchResults.style.display = 'block';
-                }
-                displayNames(results)
-            }
-        })
-        document.addEventListener('click', (event) => {
-            let isClickInsideInput = event.target === inputSearch;
-            let isClickInsideResults = searchResults.contains(event.target);
-            if (!isClickInsideInput && !isClickInsideResults) {
-                searchResults.innerHTML = '';
-                searchResults.style.display = 'none';
-            }
-        });
-        
-        //for-Air-Quality
-        for(let i = 0 ; i<6;i++){
-            let divAqiData = document.createElement("div");
-            divAqiData.className = 'div-aqi-data';
-            let aqiHeadingEl = document.createElement('p');
-            aqiHeadingEl.appendChild(document.createTextNode(`${aqiDataArray[i]}`));
-            let aqiTextEl = document.createElement("p")
-            aqiTextEl.appendChild(document.createTextNode(`(${aqiDataArrayshort[i]})`))
-            let aqiPaData = document.createElement("p")
-            let aqiValueData = data['current']['air_quality'][aqiRenderArray[i]]
-            if(aqiDataArrayshort[i]==='PM10' || aqiDataArrayshort[i]==='PM2.5'){
-                if(aqiValueData>=100){
-                    divAqiData.style.backgroundColor = '#ee7777';
-                }
-                else if(aqiValueData>50){
-                    divAqiData.style.backgroundColor = '#dc7a8a';
-                }
-                
-                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
-            }
-            else{
-                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} ppb`))
-                
-                
-            }
-            divAqiData.appendChild(aqiHeadingEl)
-            divAqiData.appendChild(aqiTextEl);
-            divAqiData.appendChild(aqiPaData)
-            airQualityEl.appendChild(divAqiData)
+  function toTitleCase(s) {
+    return s.replace(/(^|\s)\S/g, (t) => t.toUpperCase());
+  }
 
-        }
-        //image-element
-        let imgData = document.createElement("div");
-        imgData.className = "img-data";
-        let imgEl = document.createElement("img");
-        imgEl.setAttribute("src",`${data["current"]["condition"]["icon"]}`);
-        imgData.appendChild(imgEl);
-        //temp-data
-        let tempData = document.createElement("p");
-        tempData.className = "temp-data";
-        let tempToday = Math.floor(data["current"]["temp_c"]);
-        tempData.appendChild(document.createTextNode(`${tempToday}°C`));
-        //date-data
-        let date = new Date();
-        const options = {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-        };
-        let todayDate = date.toLocaleDateString("en-us",options);
-        let dateEl = document.createElement("p");
-        dateEl.className = "today-date";
-        dateEl.appendChild(document.createTextNode(`${todayDate}`))
-        weatherData.appendChild(imgData);
-        weatherData.appendChild(tempData);
-        weatherData.appendChild(dateEl);
-
-        //today-el
-        let todayFeelTemp = data["current"]["feelslike_c"]
-        let spanTodayEl = document.createElement('span')
-        spanTodayEl.className = 'span-today-el';
-        if(todayFeelTemp>=35){
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-high"></i>`
-        }
-        else if(todayFeelTemp>15 && todayFeelTemp<35){
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-three-quarters"></i>`
-        }
-        else if(todayFeelTemp>0 && todayFeelTemp<15){
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-quarter"></i>`
-        }
-        else{
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-low"></i>`
-        }
-        let weatherTodayEl = document.createElement("p");
-        weatherTodayEl.className = "weather-today-p";
-        let tempRangeData = Math.floor(todayFeelTemp);
-        weatherTodayEl.appendChild(document.createTextNode(`Feels like : ${tempRangeData}°C`));
-        todayEl.appendChild(spanTodayEl);
-        todayEl.appendChild(weatherTodayEl);
-        //location-name
-        locationNameEl.textContent = `${data['location']['name']} , ${data['location']['country']}`
-        //container
-        //wind-data
-
-        let windDataKm = document.createElement("p")
-        windDataKm.className = "today-wind-speed"
-        let windDirection = document.createElement("p")
-        windDataKm.appendChild(document.createTextNode(`${data["current"]["wind_kph"]} km/hr`))
-        windDirection.innerHTML = `<i class="fa-regular fa-compass"></i> ${data["current"]["wind_dir"]}`
-        windDataKm.appendChild(windDirection)
-        windParentEl.appendChild(windDataKm)
-        //pressure-data
-        let pressureEl = document.createElement('p')
-        pressureEl.appendChild(document.createTextNode(`${data['current']['pressure_mb']} hPa`))
-        let pressureTextEl = document.createElement('p')
-        pressureTextEl.appendChild(document.createTextNode('Normal 🤘'))
-        pressureParentEl.appendChild(pressureEl);
-        pressureParentEl.appendChild(pressureTextEl);
-        //humidity-data
-        let humidityData = data["current"]["humidity"]
-        let humidityEl = document.createElement("p")
-        humidityEl.appendChild(document.createTextNode(`${humidityData}%`))
-        let humidtyDataEl = document.createElement("p")
-        if(humidityData>=30 && humidityData<=50){
-            humidtyDataEl.appendChild(document.createTextNode(`Normal 🤙🏻`))
-        }
-        else if(humidityData>50){
-            humidtyDataEl.appendChild(document.createTextNode('High 🙄'))
-        }
-        else{
-            humidtyDataEl.appendChild(document.createTextNode('Dry 😏'))
-        }
-        humidityParentEl.appendChild(humidityEl)
-        humidityParentEl.appendChild(humidtyDataEl)
-        //visibility-data
-        let visibiltyRangeEl = document.createElement("p");
-        let visibilityData = data["current"]["vis_km"];
-        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData} km`))
-        let visibilityDataEl = document.createElement("p")
-        if(visibilityData>=10){
-            visibilityDataEl.appendChild(document.createTextNode('Good 🙂'))
-        }
-        else if(visibilityData>=5 && visibilityData<10){
-            visibilityDataEl.appendChild(document.createTextNode('Moderate 😐'))
-        }
-        else{
-            visibilityDataEl.appendChild(document.createTextNode("Poor 🙁"))
-        }
-        visibilityParentEl.appendChild(visibiltyRangeEl)
-        visibilityParentEl.appendChild(visibilityDataEl)
-        //rain-data
-        let rainDataEl = document.createElement("p")
-        let rainTodayData = data["current"]["precip_mm"]
-        rainDataEl.appendChild(document.createTextNode(`${rainTodayData} mm`))
-        let rainTextEl = document.createElement('p');
-        let todayPpDate = new Date()
-        rainTextEl.appendChild(document.createTextNode(`${data['forecast']['forecastday'][0]['hour'][todayPpDate.getHours()]['condition']['text']}`))
-        rainParentEl.appendChild(rainDataEl);
-        rainParentEl.appendChild(rainTextEl);
-
-        //uv-data
-        let uvDataEl = document.createElement("p")
-        let uvRangeEl = document.createElement("p")
-        let uvData = data["current"]["uv"]
-        uvDataEl.appendChild(document.createTextNode(`${uvData}`))
-        if(0<=uvData && uvData<=2){
-            uvRangeEl.appendChild(document.createTextNode('Normal 🙂'))
-        }
-        else if(2<uvData && uvData<=5){
-            uvRangeEl.appendChild(document.createTextNode('Moderate 😐'))
-        }
-        else if(5<uvData && uvData<=7){
-            uvRangeEl.appendChild(document.createTextNode('High 🙁'))
-        }
-        else if(8<uvData && uvData<=10){
-            uvRangeEl.appendChild(document.createTextNode('Very High ☹️'))
-        }
-        else{
-            uvRangeEl.appendChild(document.createTextNode('Extreme 🤕'))
-        }
-        uvIndexParentEl.appendChild(uvDataEl)
-        uvIndexParentEl.appendChild(uvRangeEl)
-        
-        //sunrise-sunset
-        /*
-        // let sunriseTiming = data['forecast']['forecastday'][0]['astro']['sunrise']
-        // let sunsetTiming = data['forecast']['forecastday'][0]['astro']['sunset']
-        // console.log(sunriseTiming,sunsetTiming);
-        // //sun-moon
-        // let moonIcon = document.querySelector("#moon-fa-moon");
-        // let sunIcon = document.querySelector("#sun-fa-sun");
-        // let dateT = new Date()
-        // let sunriseT = false;
-        // dateTime = dateT.toLocaleTimeString([], { hour: '2-digit', minute: "2-digit" });
-        // let sunStripWidth = sunStripEl.getBoundingClientRect().width
-        // console.log(Math.floor(sunStripWidth));
-        // // Function to check if current time is before sunrise
-        // function checkTimeAndExecute(sunriseTime) {
-        //     // Get current time
-        //     let currentTime = new Date();
-        //     let currentFormattedTime = formatTime(currentTime);
-
-        //     console.log("Current time: " + currentFormattedTime);
-        //     console.log("Sunrise time: " + sunriseTime);
-
-        //     // Convert the sunrise time (e.g., '6:30 AM') to a comparable time in minutes
-        //     let sunriseMinutes = convertToMinutes(sunriseTime, currentTime);
-        //     let currentMinutes = convertToMinutes(currentFormattedTime, currentTime);
-
-        //     // Compare current time with sunrise time (in minutes)
-        //     if (currentMinutes < sunriseMinutes) {
-        //         sunriseT = false;
-        //     } else {
-        //         sunriseT = true;
-        //         console.log("Current time is later than sunrise. No task executed.");
-        //     }
-        // }
-
-        // // Function to format time from Date object to 'HH:mm' format (e.g., '06:30')
-        // function formatTime(date) {
-        //     let hours = date.getHours();
-        //     let minutes = date.getMinutes();
-        //     return (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
-        // }
-
-        // // Function to convert time from '6:30 AM' or '6:30 PM' format to minutes since midnight
-        // function convertToMinutes(time, currentTime) {
-        //     let [timePart, period] = time.split(' ');  // Split the time part from AM/PM
-        //     let [hours, minutes] = timePart.split(':').map(num => parseInt(num));
-
-        //     // Convert 12-hour format to 24-hour format based on AM/PM
-        //     if (period === 'PM' && hours !== 12) {
-        //         hours += 12;  // Convert PM hours to 24-hour format
-        //     } else if (period === 'AM' && hours === 12) {
-        //         hours = 0;  // Convert 12 AM to 00:00 (midnight)
-        //     }
-
-        //     // If the current time is after midnight and before sunrise, consider sunrise as the next day
-        //     let sunriseDate = new Date(currentTime);
-        //     sunriseDate.setHours(hours);
-        //     sunriseDate.setMinutes(minutes);
-        //     sunriseDate.setSeconds(0);
-
-        //     // If current time is after midnight and the sunrise time is earlier, adjust the sunrise to the next day
-        //     if (currentTime.getHours() < hours || (currentTime.getHours() === hours && currentTime.getMinutes() < minutes)) {
-        //         sunriseDate.setDate(sunriseDate.getDate() + 1);  // Move sunrise to the next day
-        //     }
-
-        //     return sunriseDate.getHours() * 60 + sunriseDate.getMinutes();  // Convert the time to total minutes since midnight
-        // }
-        // checkTimeAndExecute(sunriseTiming);
-        // function toMinutes(timeStr) {
-        //     let [time, period] = timeStr.split(' ');
-        //     let [hours, minutes] = time.split(':').map(Number);
-
-        //     if (period === 'PM' && hours !== 12) {
-        //         hours += 12;
-        //     } else if (period === 'AM' && hours === 12) {
-        //         hours = 0;
-        //     }
-        //     return hours * 60 + minutes;
-        // }
-        // function subtractTimes(startStr, endStr) {
-        //     let startMin = toMinutes(startStr);
-        //     let endMin = toMinutes(endStr);
-        //     if (endMin < startMin) {
-        //         endMin += 24 * 60;
-        //     }
-        //     let diff = endMin - startMin;
-        //     // let hours = Math.floor(diff / 60);
-        //     // let minutes = diff % 60;
-        //     return(diff/60)
-        // }
-        // let nDay = subtractTimes(sunriseTiming,sunsetTiming);
-        // let nNight = subtractTimes(sunsetTiming,sunriseTiming)
-        // let sunsetWidth = subtractTimes(sunsetTiming,dateTime);
-        // let sunriseWidth = subtractTimes(sunriseTiming,dateTime);
-        // console.log(nDay,nNight,sunStripWidth,sunriseWidth,sunsetWidth);
-        
-        
-
-
-        // if(sunriseT){
-        //     sunSectionEl.style.backgroundColor = '#113131';
-        //     moonIcon.style.display = 'block';
-        //     sunIcon.style.display = 'none';
-        //     moonIcon.style.color = "#FFF";
-        //     sunStripEl.style.backgroundColor = '#fd91f0';
-        //     sunSectionEl.style.color = '#fff';
-        //     sunTimingEl.style.flexDirection = 'row-reverse';
-        //     let leftNightPosition = (sunStripWidth/nNight)*sunsetWidth + 8;
-        //     console.log(leftNightPosition);
-        //     moonIcon.style.left = `${leftNightPosition}px`;
-        // }
-        // else{
-        //     sunSectionEl.style.backgroundColor = '#fff';
-        //     sunSectionEl.style.color = '#000';
-        //     moonIcon.style.display = 'none';
-        //     sunIcon.style.display = 'block';
-        //     sunStripEl.style.backgroundColor = '#f8f85c';
-        //     sunSectionEl.style.color = '#000';
-        //     sunTimingEl.style.flexDirection = 'row';
-        //     let leftDayPosition = (sunStripWidth/nDay)*sunriseWidth + 4;
-        //     sunIcon.style.left = `${leftDayPosition}px`;
-        // }
-        // let sunriseDivEl = document.createElement("div")
-        // let sunsetDivEl = document.createElement('div')
-        // let sunriseEl = document.createElement('p')
-        // sunriseEl.appendChild(document.createTextNode(`Sunrise : ${sunriseTiming}`))
-        // let sunriseImgEl = document.createElement('img')
-        // sunriseImgEl.setAttribute('src','sunrise-org.png')
-        // let sunsetEl = document.createElement('p')
-        // sunsetEl.appendChild(document.createTextNode(`Sunset : ${sunsetTiming}`))
-        // let sunsetImgEl = document.createElement('img');
-        // sunsetImgEl.setAttribute('src','sunset-org.png')
-        // sunriseDivEl.appendChild(sunriseEl)
-        // sunriseDivEl.appendChild(sunriseImgEl)
-        // sunsetDivEl.appendChild(sunsetEl)
-        // sunsetDivEl.appendChild(sunsetImgEl)
-        // sunTimingEl.appendChild(sunriseDivEl)
-        // sunTimingEl.appendChild(sunsetDivEl)
-        */
-        //weekly-data
-        data['forecast']['forecastday'].forEach((dataQ)=> {
-            // remove the comment for o/p details:console.log(dataQ);
-            count += 1;
-            //parent-div
-            let weeklyDivEl = document.createElement("div")
-            //p-element
-            let weekDayEl = document.createElement("p")
-            const dateString = dataQ["date"];
-            const date = new Date(dateString);
-            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const dayName = days[date.getDay()];
-            weekDayEl.appendChild(document.createTextNode(`${dayName}`))
-            // //img-element
-            let weeklyImgEl = document.createElement("img")
-            weeklyImgEl.setAttribute("src",`${dataQ["day"]["condition"]["icon"]}`)
-            weeklyImgEl.setAttribute("alt",dataQ["day"]["condition"]["text"])
-            let weekTempEl = document.createElement("p")
-            let maxTemp = Math.floor(dataQ["day"]["maxtemp_c"])
-            let minTemp = Math.floor(dataQ["day"]["mintemp_c"])
-            weekTempEl.innerHTML = `High:${maxTemp}°C Low:${minTemp}°C`
-            weeklyDivEl.appendChild(weekDayEl)
-            weeklyDivEl.appendChild(weeklyImgEl)
-            weeklyDivEl.appendChild(weekTempEl)
-            weeklyDataEl.appendChild(weeklyDivEl)
-        });
-        weekDayH2.textContent = `${count}-Days Weather`;
-    }).catch((error)=>{
-        errorFunction();
-    })
-},
-  (error) => {
-    if (error.code === error.PERMISSION_DENIED) {
-      alert("Location access is needed for weather info. Please enable location.");
-      locationError();
-    } else if (error.code === error.POSITION_UNAVAILABLE) {
-      alert("Location is unavailable. Please turn on your device's location services.");
-      locationError();
-    } else {
-      alert("An error occurred: " + error.message);
-      locationError();
+  // --- Unsplash image (with fallback) ---
+  async function loadUnsplash() {
+    try {
+      const res = await fetch(UNSPLASH_ENDPOINT);
+      if (!res.ok) throw new Error('Failed to load image');
+      const data = await res.json();
+      const img = document.createElement('img');
+      img.src = data.urls.full;
+      img.alt = data.alt_description || 'background image';
+      clearChildren(unsplashImgParent);
+      unsplashImgParent.appendChild(img);
+    } catch (err) {
+      // fallback static image
+      const img = document.createElement('img');
+      img.src = 'https://images.unsplash.com/photo-1483206048520-2321c1a5fb36?crop=entropy&cs=srgb&fm=jpg&q=85';
+      img.alt = 'fallback image';
+      clearChildren(unsplashImgParent);
+      unsplashImgParent.appendChild(img);
     }
   }
-)
 
-//function-render
-function renderData(locationName){
-    fetch(`https://api.weatherapi.com/v1/forecast.json?key=2e6ca350b5bc4b49a14155929252005&q=${locationName}&days=7&aqi=yes`)
-    .then((res)=>{
-        if(!res.ok){
-            throw new Error("This Location Data not available")
-        }
-        return res.json();
-    }).then((data)=>{
-        // remove the comment for o/p details:console.log(data);
-        //search-reults-li
-        
-        const getCitiesNames = async (country) => {
-            try {
-                const response = await fetch("https://countriesnow.space/api/v0.1/countries/cities", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                    body: JSON.stringify({ country })
-                });
+  // --- Geolocation wrapper that returns a promise ---
+  function getCurrentPositionAsync(options = {}) {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation is not supported by this browser.'));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    });
+  }
 
-                if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-                }
+  // --- Fetch weather with request id check ---
+  async function fetchWeather(locationQuery, requestId) {
+    const url = `${WEATHER_BASE}?key=${WEATHER_API_KEY}&q=${encodeURIComponent(locationQuery)}&days=7&aqi=yes`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('This location data is not available');
+    const data = await res.json();
+    // if this request is not latest, ignore result
+    if (requestId !== latestRequestId) throw new Error('stale-response');
+    return data;
+  }
 
-                const data = await response.json();
-
-                if (data.error) {
-                    console.error("API Error:", data.msg);
-                return;
-                }
-
-                citiesNames=data.data;
-                
-            }
-            catch (error) {
-                console.error("Fetch error:", error.message);
-            }
-        };
-        getCitiesNames(data['location']['country']);
-        function displayNames(results){
-            searchResults.innerHTML = ''
-            if(results.length>8){
-                for(let i=0;i<8;i++){
-                    let liEl = document.createElement('li')
-                    liEl.textContent = `${results[i]}`
-                    liEl.addEventListener("click",()=>{
-                        inputSearch.value = `${results[i]}`
-                        searchResults.innerHTML = ''
-                        searchResults.style.display = 'none';
-                    })
-                    searchResults.appendChild(liEl);
-                }
-            }
-            else{
-                for(let i=0;i<results.length;i++){
-                    let liEl = document.createElement('li')
-                    liEl.textContent = `${results[i]}`
-                    liEl.addEventListener("click",()=>{
-                        inputSearch.value = `${results[i]}`
-                        searchResults.innerHTML = ''
-                        searchResults.style.display = 'none';
-                    })
-                    searchResults.appendChild(liEl);
-                }
-            }
-    
-        }
-        function filteredArray(query){
-            let t = citiesNames.filter((data)=>{
-                return data.toLowerCase().startsWith(query.toLowerCase());
-            })
-            if(t.length==0){
-                searchResults.style.display = 'none';
-            }
-            return t;
-        }
-        inputSearch.addEventListener("input",()=>{
-            let query = inputSearch.value;
-            // console.log(query);
-            searchResults.style.display = 'block';
-            if(query == ''){
-                searchResults.innerHTML = '';
-                searchResults.style.display = 'none';
-            }
-            else{
-                let results = filteredArray(query);
-                // remove the comment for o/p details:console.log(results);
-                displayNames(results)
-            }
-        })
-        document.addEventListener('click', (event) => {
-            let isClickInsideInput = event.target === inputSearch;
-            let isClickInsideResults = searchResults.contains(event.target);
-            if (!isClickInsideInput && !isClickInsideResults) {
-                searchResults.innerHTML = '';
-                searchResults.style.display = 'none';
-            }
-        });
-        
-        //weather-data
-        footerEl.style.position = "static";
-        weatherToday.style.display="flex";
-        mainContainer.style.display="block";
-        aqiSection.style.display = 'block';
-        //error
-        errorDiv.style.display='none';
-        locationErrorEl.style.display = 'none';
-        //for-aqi-data
-        for(let i = 0 ; i<6;i++){
-            let divAqiData = document.createElement("div");
-            divAqiData.className = 'div-aqi-data';
-            let aqiHeadingEl = document.createElement('p');
-            aqiHeadingEl.appendChild(document.createTextNode(`${aqiDataArray[i]}`));
-            let aqiTextEl = document.createElement("p");
-            aqiTextEl.appendChild(document.createTextNode(`(${aqiDataArrayshort[i]})`));
-            let aqiPaData = document.createElement("p");
-            let aqiValueData = data['current']['air_quality'][aqiRenderArray[i]];
-            if(aqiDataArrayshort[i]==='PM10' || aqiDataArrayshort[i]==='PM2.5'){
-                if(aqiValueData>=100){
-                    divAqiData.style.backgroundColor = '#ee7777';
-                }
-                else if(aqiValueData>50){
-                    divAqiData.style.backgroundColor = '#dc7a8a';
-                }
-                
-                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} u/m³`))
-            }
-            else{
-                aqiPaData.appendChild(document.createTextNode(`${aqiValueData} ppb`))
-            }
-            divAqiData.appendChild(aqiHeadingEl)
-            divAqiData.appendChild(aqiTextEl);
-            divAqiData.appendChild(aqiPaData);
-            airQualityEl.appendChild(divAqiData);
-        }
-        //img-data
-        let imgData = document.createElement("div");
-        imgData.className = "img-data";
-        let imgEl = document.createElement("img");
-        imgEl.setAttribute("src",`${data["current"]["condition"]["icon"]}`);
-        imgData.appendChild(imgEl);
-        //temp-data
-        let tempData = document.createElement("p");
-        tempData.className = "temp-data";
-        let tempToday = Math.floor(data["current"]["temp_c"]);
-        tempData.appendChild(document.createTextNode(`${tempToday}°C`));
-        //date-data
-        let date = new Date();
-        const options = {
-            weekday: "long",
-            month: "long",
-            day: "numeric",
-        };
-        let todayDate = date.toLocaleDateString("en-us",options);
-        let dateEl = document.createElement("p");
-        dateEl.className = "today-date";
-        dateEl.appendChild(document.createTextNode(`${todayDate}`))
-        weatherData.appendChild(imgData);
-        weatherData.appendChild(tempData);
-        weatherData.appendChild(dateEl);
-
-        //today-el
-        let todayFeelTemp = data["current"]["feelslike_c"]
-        let spanTodayEl = document.createElement('span')
-        spanTodayEl.className = 'span-today-el';
-        if(todayFeelTemp>=35){
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-high"></i>`
-        }
-        else if(todayFeelTemp>15 && todayFeelTemp<35){
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-three-quarters"></i>`
-        }
-        else if(todayFeelTemp>0 && todayFeelTemp<15){
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-quarter"></i>`
-        }
-        else{
-            spanTodayEl.innerHTML = `<i class="fa-solid fa-temperature-low"></i>`
-        }
-        let weatherTodayEl = document.createElement("p");
-        weatherTodayEl.className = "weather-today-p";
-        let tempRangeData = Math.floor(todayFeelTemp);
-        weatherTodayEl.appendChild(document.createTextNode(`Feels like : ${tempRangeData}°C`));
-        todayEl.appendChild(spanTodayEl);
-        todayEl.appendChild(weatherTodayEl);
-        //location-el
-        locationNameEl.textContent = `${data['location']['name']} , ${data['location']['country']}`
-        //Container
-        //wind-data
-        let headingWind = document.createElement("p");
-        headingWind.className = "highlights-heading"
-        headingWind.innerHTML = `<i class="fa-solid fa-wind"></i> Wind Status`;
-        let windDataKm = document.createElement("p");
-        windDataKm.className = "today-wind-speed";
-        let windDirection = document.createElement("p");
-        windDataKm.appendChild(document.createTextNode(`${data["current"]["wind_kph"]} km/hr`));
-        windDirection.innerHTML = `<i class="fa-regular fa-compass"></i> ${data["current"]["wind_dir"]}`;
-        windParentEl.appendChild(headingWind)
-        windDataKm.appendChild(windDirection)
-        windParentEl.appendChild(windDataKm)
-       
-        //pressure-data
-        let headingPressure = document.createElement("p")
-        headingPressure.className = "highlights-heading"
-        headingPressure.innerHTML = `<i class="fa-regular fa-face-smile"></i> Air Pressure`
-        let pressureEl = document.createElement('p')
-        pressureEl.appendChild(document.createTextNode(`${data['current']['pressure_mb']} hPa`))
-        let pressureTextEl = document.createElement('p')
-        pressureTextEl.appendChild(document.createTextNode('Normal 🤘'))
-        pressureParentEl.appendChild(headingPressure);
-        pressureParentEl.appendChild(pressureEl);
-        pressureParentEl.appendChild(pressureTextEl);
-
-        
-        //humidity-data
-        let headingHumidity = document.createElement("p");
-        headingHumidity.className = "highlights-heading";
-        headingHumidity.innerHTML = `<i class="fa-solid fa-droplet"></i> Humidity`
-        let humidityData = data["current"]["humidity"];
-        let humidityEl = document.createElement("p")
-        humidityEl.appendChild(document.createTextNode(`${humidityData}%`))
-        let humidtyDataEl = document.createElement("p")
-        if(humidityData>=30 && humidityData<=50){
-            humidtyDataEl.appendChild(document.createTextNode(`Normal 🤙🏻`))
-        }
-        else if(humidityData>50){
-            humidtyDataEl.appendChild(document.createTextNode('High 🙄'))
-        }
-        else{
-            humidtyDataEl.appendChild(document.createTextNode('Dry 😏'))
-        }
-        humidityParentEl.appendChild(headingHumidity)
-        humidityParentEl.appendChild(humidityEl)
-        humidityParentEl.appendChild(humidtyDataEl)
-
-        //visibility-data
-        let headingVisibility = document.createElement("p");
-        headingVisibility.className = "highlights-heading";
-        headingVisibility.innerHTML = `<i class="fa-solid fa-eye"></i> Visibility`;
-        let visibiltyRangeEl = document.createElement("p")
-        let visibilityData = data["current"]["vis_km"];
-        visibiltyRangeEl.appendChild(document.createTextNode(`${visibilityData} km`));
-        let visibilityDataEl = document.createElement("p")
-        if(visibilityData>=10){
-            visibilityDataEl.appendChild(document.createTextNode('Good 🙂'))
-        }
-        else if(visibilityData>=5 && visibilityData<10){
-            visibilityDataEl.appendChild(document.createTextNode('Moderate 😐'))
-        }
-        else{
-            visibilityDataEl.appendChild(document.createTextNode("Poor 🙁"))
-        }
-        visibilityParentEl.appendChild(headingVisibility)
-        visibilityParentEl.appendChild(visibiltyRangeEl)
-        visibilityParentEl.appendChild(visibilityDataEl)
-
-        //rain-data
-        let headingRain = document.createElement("p")
-        headingRain.className = "highlights-heading"
-        headingRain.innerHTML = `<p><i class="fa-solid fa-snowflake"></i> Precipitation</p>`
-        let rainDataEl = document.createElement("p")
-        let rainTodayData = data["current"]["precip_mm"]
-        rainDataEl.appendChild(document.createTextNode(`${rainTodayData} mm`))
-        let rainTextEl = document.createElement('p');
-        let todayPpDate = new Date()
-        rainTextEl.appendChild(document.createTextNode(`${data['forecast']['forecastday'][0]['hour'][todayPpDate.getHours()]['condition']['text']}`))
-        rainParentEl.appendChild(headingRain)
-        rainParentEl.appendChild(rainDataEl)
-        rainParentEl.appendChild(rainTextEl);    
-
-        //uv-data
-        let uvData = data["current"]["uv"]
-        let headingUvI = document.createElement("p")
-        headingUvI.className = "highlights-heading"
-        if(uvData>0){
-            headingUvI.innerHTML = `<i class="fa-solid fa-sun"></i> Uv Index`
-        }
-        else{
-            headingUvI.innerHTML = `<i class="fa-regular fa-moon"></i> Uv Index`
-        }
-        let uvDataEl = document.createElement("p")
-        let uvRangeEl = document.createElement("p")
-        
-        uvDataEl.appendChild(document.createTextNode(`${uvData}`))
-        if(0<=uvData && uvData<=2){
-            uvRangeEl.appendChild(document.createTextNode('Normal 🙂'))
-        }
-        else if(2<uvData && uvData<=5){
-            uvRangeEl.appendChild(document.createTextNode('Moderate 😐'))
-        }
-        else if(5<uvData && uvData<=7){
-            uvRangeEl.appendChild(document.createTextNode('High 🙁'))
-        }
-        else if(8<uvData && uvData<=10){
-            uvRangeEl.appendChild(document.createTextNode('Very High ☹️'))
-        }
-        else{
-            uvRangeEl.appendChild(document.createTextNode('Extreme 🤕'))
-        }
-        uvIndexParentEl.appendChild(headingUvI)
-        uvIndexParentEl.appendChild(uvDataEl)
-        uvIndexParentEl.appendChild(uvRangeEl)
-        count = 0
-        //weekly-data
-        data['forecast']['forecastday'].forEach((dataQ)=> {
-            //console.log(dataQ);
-            //parent-div
-            let weeklyDivEl = document.createElement("div");
-            count += 1;
-            //p-element
-            let weekDayEl = document.createElement("p");
-            const dateString = dataQ["date"];
-            const date = new Date(dateString);
-            const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const dayName = days[date.getDay()];
-            weekDayEl.appendChild(document.createTextNode(`${dayName}`))
-            // //img-element
-            let weeklyImgEl = document.createElement("img")
-            weeklyImgEl.setAttribute("src",`${dataQ["day"]["condition"]["icon"]}`)
-            weeklyImgEl.setAttribute("alt",dataQ["day"]["condition"]["text"])
-            let weekTempEl = document.createElement("p")
-            let maxTemp = Math.floor(dataQ["day"]["maxtemp_c"])
-            let minTemp = Math.floor(dataQ["day"]["mintemp_c"])
-            // weekTempEl.innerHTML = `High:${maxTemp}°C Low:${minTemp}°C`
-            weekTempEl.appendChild(document.createTextNode(`High:${maxTemp}°C Low:${minTemp}°C`))
-            weeklyDivEl.appendChild(weekDayEl)
-            weeklyDivEl.appendChild(weeklyImgEl)
-            weeklyDivEl.appendChild(weekTempEl)
-            weeklyDataEl.appendChild(weeklyDivEl)
-        });
-        weekDayH2.textContent = `${count}-Days Weather`;
-    }).catch((err)=>{
-        errorFunction();
-        console.error(err);
-
-    })
-
-}
-
-//btn-click
-searchBtn.addEventListener("click",()=>{
-    let locationName = inputSearch.value;
-    if(locationName){
-        if (weatherData.children.length) {
-            while (weatherData.firstChild) {
-                weatherData.removeChild(weatherData.firstChild);
-            }
-        }
-        if(todayEl.children.length){
-            while(todayEl.firstChild){
-                todayEl.removeChild(todayEl.firstChild)
-            }
-        }
-        
-        if(windParentEl.children.length){
-            while(windParentEl.firstChild){
-                windParentEl.removeChild(windParentEl.firstChild)
-            }
-        }
-        if(pressureParentEl.children.length){
-            while(pressureParentEl.firstChild){
-                pressureParentEl.removeChild(pressureParentEl.firstChild)
-            }
-        }
-        if(rainParentEl.children.length){
-            while(rainParentEl.firstChild){
-                rainParentEl.removeChild(rainParentEl.firstChild)
-            }
-        }
-        if(humidityParentEl.children.length){
-            while(humidityParentEl.firstChild){
-                humidityParentEl.removeChild(humidityParentEl.firstChild)
-            }
-        }
-        if(visibilityParentEl.children.length){
-            while(visibilityParentEl.firstChild){
-                visibilityParentEl.removeChild(visibilityParentEl.firstChild)
-            }
-        }
-        if(uvIndexParentEl.children.length){
-            while(uvIndexParentEl.firstChild){
-                uvIndexParentEl.removeChild(uvIndexParentEl.firstChild)
-            }
-        }
-        if(weeklyDataEl.children.length){
-            while(weeklyDataEl.firstChild){
-                weeklyDataEl.removeChild(weeklyDataEl.firstChild)
-            }
-        }
-        // sunSectionEl.style.display = 'none';
-        inputSearch.value='';
-        airQualityEl.replaceChildren();
-        //render-function
-        renderData(locationName)
+  // --- Cities list (fetch once per country) ---
+  const citiesCache = new Map();
+  async function fetchCitiesForCountry(country) {
+    if (!country) return [];
+    if (citiesCache.has(country)) return citiesCache.get(country);
+    try {
+      const res = await fetch('https://countriesnow.space/api/v0.1/countries/cities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country }),
+      });
+      if (!res.ok) throw new Error('Failed to load cities');
+      const payload = await res.json();
+      const arr = payload.data || [];
+      citiesCache.set(country, arr);
+      return arr;
+    } catch (err) {
+      console.error('fetchCitiesForCountry error:', err.message);
+      citiesCache.set(country, []);
+      return [];
     }
-})
+  }
 
+  // --- Render helpers ---
+  function renderAQI(current) {
+    clearChildren(airQualityEl);
+    for (let i = 0; i < aqiRenderArray.length; i++) {
+      const div = document.createElement('div');
+      div.className = 'div-aqi-data';
+      const heading = createText('p', aqiDataArray[i]);
+      const short = createText('p', `(${aqiDataArrayshort[i]})`);
+      const valueEl = createText('p', '');
+      const val = current.air_quality[aqiRenderArray[i]];
+      if (['PM10', 'PM2.5'].includes(aqiDataArrayshort[i])) {
+        if (val >= 100) div.style.backgroundColor = '#ee7777';
+        else if (val > 50) div.style.backgroundColor = '#dc7a8a';
+        valueEl.textContent = `${val} u/m³`;
+      } else {
+        valueEl.textContent = `${val} ppb`;
+      }
+      div.appendChild(heading);
+      div.appendChild(short);
+      div.appendChild(valueEl);
+      airQualityEl.appendChild(div);
+    }
+  }
+
+  function renderWeatherData(current) {
+    clearChildren(weatherData);
+
+    const imgWrap = document.createElement('div');
+    imgWrap.className = 'img-data';
+    const img = document.createElement('img');
+    img.src = current.condition.icon;
+    img.alt = current.condition.text || 'weather icon';
+    imgWrap.appendChild(img);
+
+    const temp = createText('p', `${Math.floor(current.temp_c)}°C`);
+    temp.className = 'temp-data';
+
+    const dateEl = createText('p', new Date().toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }));
+    dateEl.className = 'today-date';
+
+    weatherData.appendChild(imgWrap);
+    weatherData.appendChild(temp);
+    weatherData.appendChild(dateEl);
+  }
+
+  function renderTodayHighlights(current) {
+    clearChildren(todayEl);
+
+    const feel = Math.floor(current.feelslike_c);
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'span-today-el';
+    if (feel >= 35) iconSpan.innerHTML = '<i class="fa-solid fa-temperature-high"></i>';
+    else if (feel > 15) iconSpan.innerHTML = '<i class="fa-solid fa-temperature-three-quarters"></i>';
+    else if (feel > 0) iconSpan.innerHTML = '<i class="fa-solid fa-temperature-quarter"></i>';
+    else iconSpan.innerHTML = '<i class="fa-solid fa-temperature-low"></i>';
+
+    const p = createText('p', `Feels like : ${feel}°C`);
+    p.className = 'weather-today-p';
+
+    todayEl.appendChild(iconSpan);
+    todayEl.appendChild(p);
+  }
+
+  function renderHighlightsSection(data) {
+    // wind
+    clearChildren(windParentEl);
+    const headingWind = createIconHTML('<p class="highlights-heading"><i class="fa-solid fa-wind"></i> Wind Status</p>');
+    const windDataKm = createText('p', `${data.current.wind_kph} km/hr`);
+    windDataKm.className = 'today-wind-speed';
+    const windDir = createIconHTML(`<p><i class="fa-regular fa-compass"></i> ${data.current.wind_dir}</p>`);
+    windDataKm.appendChild(windDir);
+    windParentEl.appendChild(headingWind);
+    windParentEl.appendChild(windDataKm);
+
+    // pressure
+    clearChildren(pressureParentEl);
+    pressureParentEl.appendChild(createIconHTML('<p class="highlights-heading"><i class="fa-regular fa-face-smile"></i> Air Pressure</p>'));
+    pressureParentEl.appendChild(createText('p', `${data.current.pressure_mb} hPa`));
+    pressureParentEl.appendChild(createText('p', `Normal 🤘`));
+
+    // humidity
+    clearChildren(humidityParentEl);
+    humidityParentEl.appendChild(createIconHTML('<p class="highlights-heading"><i class="fa-solid fa-droplet"></i> Humidity</p>'));
+    const humidity = data.current.humidity;
+    humidityParentEl.appendChild(createText('p', `${humidity}%`));
+    if (humidity >= 30 && humidity <= 50) humidityParentEl.appendChild(createText('p', 'Normal 🤙🏻'));
+    else if (humidity > 50) humidityParentEl.appendChild(createText('p', 'High 🙄'));
+    else humidityParentEl.appendChild(createText('p', 'Dry 😏'));
+
+    // visibility
+    clearChildren(visibilityParentEl);
+    visibilityParentEl.appendChild(createIconHTML('<p class="highlights-heading"><i class="fa-solid fa-eye"></i> Visibility</p>'));
+    const vis = data.current.vis_km;
+    visibilityParentEl.appendChild(createText('p', `${vis} km`));
+    if (vis >= 10) visibilityParentEl.appendChild(createText('p', 'Good 🙂'));
+    else if (vis >= 5) visibilityParentEl.appendChild(createText('p', 'Moderate 😐'));
+    else visibilityParentEl.appendChild(createText('p', 'Poor 🙁'));
+
+    // rain
+    clearChildren(rainParentEl);
+    rainParentEl.appendChild(createIconHTML('<p class="highlights-heading"><i class="fa-solid fa-snowflake"></i> Precipitation</p>'));
+    rainParentEl.appendChild(createText('p', `${data.current.precip_mm} mm`));
+    const nowHour = new Date().getHours();
+    const condText = data.forecast?.forecastday?.[0]?.hour?.[nowHour]?.condition?.text || '';
+    rainParentEl.appendChild(createText('p', condText));
+
+    // uv
+    clearChildren(uvIndexParentEl);
+    const uv = data.current.uv;
+    uvIndexParentEl.appendChild(createIconHTML(`<p class="highlights-heading">${uv > 0 ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-regular fa-moon"></i>'} Uv Index</p>`));
+    uvIndexParentEl.appendChild(createText('p', `${uv}`));
+    if (0 <= uv && uv <= 2) uvIndexParentEl.appendChild(createText('p', 'Normal 🙂'));
+    else if (uv <= 5) uvIndexParentEl.appendChild(createText('p', 'Moderate 😐'));
+    else if (uv <= 7) uvIndexParentEl.appendChild(createText('p', 'High 🙁'));
+    else if (uv <= 10) uvIndexParentEl.appendChild(createText('p', 'Very High ☹️'));
+    else uvIndexParentEl.appendChild(createText('p', 'Extreme 🤕'));
+  }
+
+  function renderWeekly(forecastArr) {
+    clearChildren(weeklyDataEl);
+    let daysCount = 0;
+    forecastArr.forEach((day) => {
+      daysCount++;
+      const weeklyDiv = document.createElement('div');
+      const dayName = new Date(day.date).toLocaleDateString('en-us', { weekday: 'long' });
+      weeklyDiv.appendChild(createText('p', dayName));
+      const img = document.createElement('img');
+      img.src = day.day.condition.icon;
+      img.alt = day.day.condition.text || '';
+      weeklyDiv.appendChild(img);
+      weeklyDiv.appendChild(createText('p', `High:${Math.floor(day.day.maxtemp_c)}°C Low:${Math.floor(day.day.mintemp_c)}°C`));
+      weeklyDataEl.appendChild(weeklyDiv);
+    });
+    weekDayH2.textContent = `${daysCount}-Days Weather`;
+  }
+
+  // --- Search UI (single setup, avoids duplication) ---
+  function debounce(fn, wait = 250) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  }
+
+  function setupSearchHandlers() {
+    // click outside to hide
+    document.addEventListener('click', (event) => {
+      const isClickInsideInput = event.target === inputSearch;
+      const isClickInsideResults = searchResults.contains(event.target);
+      if (!isClickInsideInput && !isClickInsideResults) {
+        clearChildren(searchResults);
+        searchResults.style.display = 'none';
+      }
+    });
+
+    inputSearch.addEventListener(
+      'input',
+      debounce(async () => {
+        const query = inputSearch.value.trim();
+        if (!query) {
+          clearChildren(searchResults);
+          searchResults.style.display = 'none';
+          return;
+        }
+        // If cities list not loaded, show empty
+        if (!citiesNames || !citiesNames.length) {
+          searchResults.style.display = 'none';
+          return;
+        }
+        const filtered = citiesNames.filter((c) => c.toLowerCase().startsWith(query.toLowerCase()));
+        clearChildren(searchResults);
+        if (!filtered.length) {
+          searchResults.style.display = 'none';
+          return;
+        }
+        const max = Math.min(filtered.length, 10);
+        for (let i = 0; i < max; i++) {
+          const li = document.createElement('li');
+          li.textContent = filtered[i];
+          li.addEventListener('click', () => {
+            inputSearch.value = filtered[i];
+            clearChildren(searchResults);
+            searchResults.style.display = 'none';
+          });
+          searchResults.appendChild(li);
+        }
+        searchResults.style.display = 'block';
+      }, 200)
+    );
+
+    // allow Enter key for search
+    inputSearch.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        searchBtn.click();
+      }
+    });
+
+    // prevent accidental form submit (if any) by preventing default on click
+    searchBtn.addEventListener('click', (ev) => {
+      if (ev) ev.preventDefault && ev.preventDefault();
+      const locationName = inputSearch.value.trim();
+      if (!locationName) return;
+
+      // Clear UI containers safely
+      clearChildren(weatherData);
+      clearChildren(todayEl);
+      clearChildren(windParentEl);
+      clearChildren(pressureParentEl);
+      clearChildren(rainParentEl);
+      clearChildren(humidityParentEl);
+      clearChildren(visibilityParentEl);
+      clearChildren(uvIndexParentEl);
+      clearChildren(weeklyDataEl);
+      clearChildren(airQualityEl);
+
+      // reset input
+      inputSearch.value = '';
+
+      // trigger render
+      renderData(locationName);
+    });
+  }
+
+  // --- Main render data function (used for both geolocation and search) ---
+  async function renderData(locationName) {
+    const requestId = ++latestRequestId;
+    try {
+      const data = await fetchWeather(locationName, requestId);
+      // success UI state
+      setFooterStatic();
+      weatherToday.style.display = 'flex';
+      mainContainer.style.display = 'block';
+      aqiSection.style.display = 'block';
+      errorDiv.style.display = 'none';
+      locationErrorEl.style.display = 'none';
+
+      // fetch cities once for search auto-complete
+      citiesNames = await fetchCitiesForCountry(data.location.country);
+
+      // render sections
+      renderAQI(data.current);
+      renderWeatherData(data.current);
+      renderTodayHighlights(data.current);
+      locationNameEl.textContent = `${data.location.name} , ${data.location.country}`;
+      renderHighlightsSection(data);
+      renderWeekly(data.forecast.forecastday);
+    } catch (err) {
+      if (err.message === 'stale-response') return; // ignore stale
+      console.error('renderData error:', err.message || err);
+      showGenericError(err.message || 'Sorry! Something went wrong');
+    }
+  }
+
+  // --- Initialization ---
+  setupSearchHandlers();
+  await loadUnsplash();
+
+  // Try geolocation first (graceful fallbacks)
+  try {
+    const pos = await getCurrentPositionAsync({ enableHighAccuracy: false, timeout: 8000 });
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    // render weather using lat,lon
+    await renderData(`${lat},${lon}`);
+  } catch (err) {
+    // show a friendly location-related UI instead of multiple alerts
+    console.warn('Geolocation error:', err.message || err);
+    if (err.code === 1 || (err.message && err.message.toLowerCase().includes('permission'))) {
+      showLocationError('Location access is needed for weather info. Please enable location.');
+    } else {
+      // still allow user to search manually
+      showGenericError('Unable to get device location. You can search places manually.')
+      // Optionally do not hide the search box so user can search
+      weatherToday.style.display = 'none';
+      mainContainer.style.display = 'none';
+      aqiSection.style.display = 'none';
+    }
+  }
+
+  // expose renderData for manual testing (optional)
+  window._renderData = renderData;
+})();
