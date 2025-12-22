@@ -1,5 +1,5 @@
 # WeatherMate
-## A real-time meteorological dashboard providing location-based weather data and Air Quality Index (AQI) metrics.
+## A real-time meteorological dashboard providing location-based weather data with search feature and Air Quality Index (AQI) metrics.
 
 ## Overview
 Weather Web App is a lightweight, responsive application designed to provide users with accurate, real-time weather conditions. By leveraging the browser's Geolocation API and third-party weather data providers, the application delivers instant meteorological data for the user's current location, as well as global search capabilities.
