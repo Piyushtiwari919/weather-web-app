@@ -264,6 +264,7 @@ footer .footer-div{
     background-color: #212121;
     color:#fff;
     display: flex;
+    width:100dvw;
     position:fixed;
     bottom:0;
     flex-direction: column;
@@ -307,6 +308,7 @@ footer .footer-div{
 .location-error-parent h2{
     font-size: 2rem;
 }
+
 
 
 
