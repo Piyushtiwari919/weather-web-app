@@ -265,6 +265,7 @@ footer .footer-div{
     color:#fff;
     display: flex;
     width:100dvw;
+    padding: 0 0.8em;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -306,6 +307,7 @@ footer .footer-div{
 .location-error-parent h2{
     font-size: 2rem;
 }
+
 
 
 
