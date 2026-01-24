@@ -14,14 +14,14 @@ Responsive Design: Built with a mobile-first approach, ensuring a seamless exper
 Minimalist UI: Clean, intuitive interface focusing on data readability and user experience (UX).
 
 ## Tech Stack
-** Frontend: HTML5, CSS3, JavaScript (ES6+)
+**Frontend**: HTML5, CSS3, JavaScript (ES6+)
 
-** Architecture: Client-side rendering (SPA feel)
+**Architecture**: Client-side rendering (SPA feel)
 
 ## APIs:
-HTML5 Geolocation API
-WeatherMap API (Weather Data)
-WeatherMap API (AQI Data)
+- HTML5 Geolocation API
+- WeatherMap API (Weather Data)
+- WeatherMap API (AQI Data)
 
 ## Important Configuration
 Geolocation Permissions: For the automatic location detection feature to function, you must allow location access when prompted by your browser. Ensure your device's location services are turned on.
