@@ -1,5 +1,3 @@
-// Refactored script.js
-// Preserves original constant names (DO NOT rename these) and improves structure, error handling, and scalability.
 
 (async function () {
   'use strict';
@@ -458,3 +456,4 @@
   // expose renderData for manual testing (optional)
   window._renderData = renderData;
 })();
+
