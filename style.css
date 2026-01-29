@@ -660,17 +660,95 @@ body {
 }
 
 /* AQI Section */
+/* AQI Section Container */
 .aqi-data-section {
     max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 20px 40px 20px;
+    margin: 4rem auto 2rem auto; /* More breathing room top/bottom */
+    padding: 0 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+    padding-top: 2rem;
+}
+
+.aqi-heading-h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: left;
+    background: linear-gradient(to right, #fff, #a5b4fc); /* Gradient Text */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
 }
 
 .air-quality-data {
     display: grid;
+    /* Smart Grid: columns will never get smaller than 160px, but fill space evenly */
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 20px;
+    gap: 24px; /* More space between cards */
+}
+
+/* The Individual AQI Cards */
+.air-quality-data div {
+    background: rgba(255, 255, 255, 0.05); /* Very subtle glass */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px; /* Softer, rounder corners */
+    padding: 1.5rem 1rem;
+    
+    /* Flexbox to center everything perfectly */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    min-height: 160px; /* Enforce uniform height */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    
+    /* Ensure text color is readable */
+    color: #fff; 
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover Effect for Interactivity */
+.air-quality-data div:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1); /* Slightly brighter on hover */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border-color: var(--accent-color);
+}
+
+/* 1st Line: The Name (e.g., "Particulate Matter") */
+.air-quality-data div p:nth-child(1) {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7); /* Muted white */
+    margin: 0 0 5px 0;
+    min-height: 2.4em; /* Ensures alignment even if text wraps to 2 lines */
+    display: flex;
+    align-items: center;
+}
+
+/* 2nd Line: The Chemical Code (e.g., "(PM2.5)") */
+.air-quality-data div p:nth-child(2) {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.4); /* Very subtle */
+    margin: 0 0 15px 0;
+}
+
+/* 3rd Line: The Value (e.g., "38.35") - THE HERO */
+.air-quality-data div p:nth-child(3) {
+    font-size: 2rem; /* Big and bold */
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    font-family: var(--font-secondary); /* Use the number-friendly font */
 }
 
 /* =========================================
@@ -812,3 +890,4 @@ footer .footer-div p {
         justify-content: center;
     }
 }
+
