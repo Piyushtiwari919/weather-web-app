@@ -1,320 +1,7 @@
-/* 
-
-*, *::before, *::after{
-    box-sizing: border-box;
-}
-body{
-    margin: 0;
-    padding:0;
-    font-family: "Raleway",sans-serif,"cursive";
-}
-.intro{
-    background-color: #CEEDDB;
-    position: relative;
-}
-
-.search{
-    display: inline-block;
-    background-color: #CEEDDB;
-    margin:0.2em;
-    margin-bottom: 1em;
-    border: 2px solid #5a5959;
-    border-radius: 5px;
-    padding:2px;
-}
-.input-search{
-    margin:0 0.2em;
-    background-color: #CEEDDB;
-    padding:0.22em;
-    font-size: 1rem;
-    border: none;
-    outline: none;
-    max-width:135px;
-    border-radius: 2px;
-
-}
-//search-start
-.search-results {
-    position: absolute;
-    z-index: 1;
-    list-style-type: none;
-    border-radius: 5px;
-    padding: 0.3em;
-    margin-top: 0.5em;
-    background-color: rgb(162, 238, 218);
-    margin-top: 0.4em;
-    border: 2px solid rgb(92, 22, 22);
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    border-radius: 4px;
-    max-height:200px;
-    display: none;
-}
-
-.search-results li {
-    margin-top:0.5em;
-    padding:5px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.search-results li:hover {
-    background-color:#000;
-    color:#fff;  
-}
-//search-end
-
-.weather-search-btn{
-    border:none;
-    color:white;
-    background-color: #3a56c9;
-    border-radius: 5px;
-    padding:0.2em;
-    margin:0 0 0.2em 0;
-    cursor: pointer;
-}
-
-.weather-today{
-    min-height:200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.weather-today h2{
-    font-size: 2rem;
-}
-
-.location-name{
-    font-size: 1.3rem;
-    font-family: Georgia, 'Times New Roman', Times, serif;
-}
-.span-today-el{
-    font-size: 1.25rem;
-}
-.weather-data{
-    display: flex;
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
-    align-items: center;
-    border-bottom: 1.4px solid #525151;
-}
-
-.img-data img{
-    width:80px;
-    height:80px;
-}
-
-.weather-data .temp-data{
-    margin-left: 0.6em;
-    font-size: 2.1rem;
-}
-
-.weather-data .today-date{
-    margin-left: 2em;
-    font-size: 1.2rem;
-    
-}
-
-.today-el{
-    display:flex;
-    align-items: center;
-    margin-bottom: 0.4em;
-}
-
-.today-el .weather-today-p{
-    margin-left: 0.6em;
-    font-size: 1.2rem;
-}
-
-.weather-today-p{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.img-unsplash{
-    position: absolute;
-    top:2px;
-    right:3px;
-    margin:0.3em 0 0 5em;
-    border-radius: 5px;
-}
-.img-unsplash img{
-    width:30px;
-    height: 30px;
-    border: 2px solid gray;
-    border-radius: 5px;
-}
-
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-}
-//Weekly Data
-.week-info,.today-info{
-    text-align: center;
-    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    margin-bottom: 20px;
-    font-size: 2.1rem;
-    color: #333;
-}
-
-.weekly-data {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 10px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.weekly-data div{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-} 
-
-.weekly-data p{
-    margin: 8px 0;
-    font-size: 1rem;
-}
-
-.weekly-data img {
-    width: 64px;
-    height: 64px;
-}
-
-.weekly-data div {
-    border-radius: 12px;
-    flex: 1 1 calc(33.333% - 16px);
-    padding: 16px;
-    text-align: center;
-    transition: transform 0.2s ease;
-}
-.weekly-data div:hover{
-    background-color: #fdfefd;
-}
-.weekly-data div p{
-    color:#272307;
-}
-.weekly-data div:hover,.today-highlights div:hover , .air-quality-data div:hover{
-    transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-//Today Highlights
-.today-highlights{
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 10px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.today-highlights div , .air-quality-data div{
-    border-radius: 12px;
-    flex: 1 1 calc(33.333% - 16px);
-    padding: 16px;
-    min-width: 140px;
-    background-color: #fff;
-    text-align: center;
-    transition: transform 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    border:2px solid blueviolet;
-}
-
-.today-wind{
-    font-size: 1.3rem;
-}
-
-.today-wind p,.pressure-data p,.today-humidity p,.today-visibility p,.today-rain p,.today-uv-index p{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 1.32rem;
-}
-//Aqi Section
-.aqi-data-section{
-    max-width: 900px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    border-top: 1px solid #212121;
-    margin:0.8em auto;
-    padding:10px;
-
-}
-.air-quality-data{
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap:10px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-.air-quality-data div{
-    font-size: 1.2rem;
-}
-.air-quality-data div:hover{
-    background-color:#CEEDDB;
-}
-
-.aqi-heading-h2{
-    font-size: 2rem;
-}
-//Footer Section
-footer{
-    margin:0;
-}
-footer .footer-div{
-    background-color: #212121;
-    color:#fff;
-    display: flex;
-    width:100dvw;
-    padding: 0 0.8em;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100px;
-    font-size: 1.25rem;
-}
-.link-section{
-    margin-bottom: 0.2em;
-    width:100%;
-    display: flex;
-    justify-content: space-between;
-}
-.link-section a{
-    text-decoration: none;
-    color:#fff;
-    margin:0.5em 1.1em 0.5em 1.1em;
-}
-
-//error styling
-.error-div-parent{
-    font-size: 2rem;
-    display: flex;
-    text-align: center;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    
-}
-
-.location-error-parent{
-    font-size: 1.8rem;
-    display: flex;
-    text-align: center;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.location-error-parent h2{
-    font-size: 2rem;
-}
-
- */
 /* =========================================
    1. VARIABLES & RESET
-   Establishes a consistent design system.
    ========================================= */
 :root {
-    /* Modern Palette: Deep Blue/Purple Gradient for a premium feel */
     --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     --glass-bg: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
@@ -360,11 +47,10 @@ body {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    /* Ensures this section sits above everything else if needed */
     z-index: 10; 
 }
 
-/* FIX 1: Search Container High Z-Index */
+/* Search Container */
 .search {
     display: flex; 
     align-items: center;
@@ -377,8 +63,6 @@ body {
     width: 100%;
     max-width: 500px;
     margin-bottom: 2rem;
-    
-    /* CRITICAL FIX: This ensures search results sit ON TOP of the weather card */
     position: relative; 
     z-index: 1000; 
 }
@@ -396,7 +80,7 @@ body {
     font-size: 1.1rem;
     flex-grow: 1; 
     font-family: var(--font-secondary);
-    min-width: 0; /* Prevents input from breaking flex layout */
+    min-width: 0; 
 }
 
 .input-search::placeholder {
@@ -413,7 +97,7 @@ body {
     cursor: pointer;
     transition: var(--transition);
     margin-left: 10px;
-    white-space: nowrap; /* Prevents button text wrapping */
+    white-space: nowrap; 
 }
 
 .weather-search-btn:hover {
@@ -422,13 +106,13 @@ body {
     box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
 }
 
-/* FIX 1 Continued: Search Results Dropdown */
+/* Search Results Dropdown */
 .search-results {
     position: absolute;
-    top: 110%; /* Pushes it slightly lower than the bar */
+    top: 110%; 
     left: 0;
     width: 100%;
-    background: #1e293b; /* Solid dark color for readability */
+    background: #1e293b; 
     border: 1px solid var(--glass-border);
     list-style: none;
     border-radius: 12px;
@@ -437,8 +121,6 @@ body {
     padding: 0;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     display: none; 
-    
-    /* CRITICAL FIX: Higher than the search bar itself */
     z-index: 1001; 
 }
 
@@ -456,9 +138,8 @@ body {
     color: #fff;
 }
 
-/* FIX 2: Profile Image / Unsplash Icon */
+/* Profile Image */
 .img-unsplash {
-    /* Default Desktop State: Absolute positioned */
     position: absolute;
     top: 20px;
     right: 20px;
@@ -481,7 +162,7 @@ body {
 }
 
 /* =========================================
-   3. WEATHER CARDS (Modernized)
+   3. WEATHER CARDS
    ========================================= */
 .weather-today {
     background: var(--glass-bg);
@@ -497,8 +178,6 @@ body {
     align-items: center;
     box-shadow: var(--glass-shadow);
     margin-bottom: 2rem;
-    
-    /* Lower Z-index so search results slide over it */
     position: relative;
     z-index: 1; 
 }
@@ -530,7 +209,7 @@ body {
 }
 
 .weather-data .temp-data {
-    font-size: 3.5rem; /* Adjusted for robustness */
+    font-size: 3.5rem; 
     font-weight: 700;
     margin: 0 1rem;
     font-family: var(--font-secondary);
@@ -572,10 +251,10 @@ body {
     width: 100%;
     margin: 0 auto;
     padding: 0 20px;
-    flex: 1; /* Pushes footer down */
+    flex: 1; 
 }
 
-.today-info, .week-info, .aqi-heading-h2 {
+.today-info, .week-info {
     font-size: 1.6rem;
     margin: 3rem 0 1.5rem 0;
     color: var(--text-main);
@@ -588,7 +267,6 @@ body {
 /* Robust Grid for Highlights */
 .today-highlights {
     display: grid;
-    /* This creates a robust responsive layout automatically */
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
     gap: 20px;
 }
@@ -635,7 +313,6 @@ body {
     font-size: 1.1rem;
 }
 
-/* Values inside cards */
 .today-highlights p:not(.highlights-heading) {
     font-size: 1.4rem;
     font-weight: 700;
@@ -659,108 +336,107 @@ body {
     color: var(--text-main);
 }
 
-/* AQI Section */
-/* AQI Section Container */
+/* =========================================
+   5. AQI SECTION (FIXED)
+   ========================================= */
 .aqi-data-section {
     max-width: 1200px;
-    margin: 4rem auto 2rem auto; /* More breathing room top/bottom */
+    width: 100%; 
+    margin: 1rem auto 2rem auto;
     padding: 0 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
-    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1); 
+    padding-top: 1.5rem;
 }
 
 .aqi-heading-h2 {
     font-size: 1.8rem;
     font-weight: 700;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     text-align: left;
-    background: linear-gradient(to right, #fff, #a5b4fc); /* Gradient Text */
+    background: linear-gradient(to right, #fff, #a5b4fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     display: inline-block;
+    border-left: 4px solid var(--accent-color); /* Added consistency with other headings */
+    padding-left: 15px;
 }
 
 .air-quality-data {
     display: grid;
-    /* Smart Grid: columns will never get smaller than 160px, but fill space evenly */
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 24px; /* More space between cards */
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
 }
 
-/* The Individual AQI Cards */
 .air-quality-data div {
-    background: rgba(255, 255, 255, 0.05); /* Very subtle glass */
+    background: rgba(255, 255, 255, 0.05); 
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px; /* Softer, rounder corners */
-    padding: 1.5rem 1rem;
+    border-radius: 20px; 
+    padding: 1.2rem 0.5rem;
     
-    /* Flexbox to center everything perfectly */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     
-    min-height: 160px; /* Enforce uniform height */
+    min-height: 140px; 
     text-align: center;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     
-    /* Ensure text color is readable */
     color: #fff; 
     position: relative;
     overflow: hidden;
 }
 
-/* Hover Effect for Interactivity */
 .air-quality-data div:hover {
     transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.1); /* Slightly brighter on hover */
+    background: rgba(255, 255, 255, 0.1); 
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     border-color: var(--accent-color);
 }
 
-/* 1st Line: The Name (e.g., "Particulate Matter") */
 .air-quality-data div p:nth-child(1) {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.7); /* Muted white */
-    margin: 0 0 5px 0;
-    min-height: 2.4em; /* Ensures alignment even if text wraps to 2 lines */
+    color: rgba(255, 255, 255, 0.7); 
+    margin: 0 0 4px 0;
+    min-height: 2.5em;
     display: flex;
     align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+    width: 100%;
 }
 
-/* 2nd Line: The Chemical Code (e.g., "(PM2.5)") */
 .air-quality-data div p:nth-child(2) {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.4); /* Very subtle */
-    margin: 0 0 15px 0;
+    color: rgba(255, 255, 255, 0.4); 
+    margin: 0 0 10px 0;
 }
 
-/* 3rd Line: The Value (e.g., "38.35") - THE HERO */
 .air-quality-data div p:nth-child(3) {
-    font-size: 2rem; /* Big and bold */
+    font-size: 1.6rem;
     font-weight: 700;
     color: #fff;
     margin: 0;
     text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    font-family: var(--font-secondary); /* Use the number-friendly font */
+    font-family: var(--font-secondary); 
 }
 
 /* =========================================
-   5. FOOTER STYLING (FIX 3)
+   6. FOOTER STYLING
    ========================================= */
 footer {
     width: 100%;
-    margin-top: auto; /* Pushes to bottom of flex container */
+    margin-top: auto; 
 }
 
 footer .footer-div {
-    background: #0f172a; /* Solid dark background for robustness */
+    background: #0f172a; 
     color: var(--text-secondary);
     display: flex;
     flex-direction: column;
@@ -780,7 +456,7 @@ footer .footer-div p {
 .link-section {
     display: flex;
     justify-content: center;
-    gap: 20px; /* Better than margins */
+    gap: 20px; 
     width: 100%;
     max-width: 400px;
 }
@@ -817,11 +493,10 @@ footer .footer-div p {
 }
 
 /* =========================================
-   6. MOBILE RESPONSIVENESS (The Senior Fix)
+   7. RESPONSIVENESS
    ========================================= */
 
 @media (max-width: 768px) {
-    /* Make search results wider on mobile */
     .search {
         max-width: 100%; 
     }
@@ -836,35 +511,37 @@ footer .footer-div p {
         margin: 15px 0;
     }
 
-    .today-highlights, .weekly-data, .air-quality-data {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+    .today-highlights, .weekly-data {
+        grid-template-columns: repeat(2, 1fr); 
     }
 }
 
 /* Small Mobile Devices */
 @media (max-width: 480px) {
-    /* FIX 2: Mobile Overlap Fix */
     .intro {
         padding-top: 0.5rem;
     }
     
     .img-unsplash {
-        /* Remove absolute positioning on mobile so it doesn't overlap */
         position: relative;
         top: auto;
         right: auto;
-        margin-bottom: 1rem; /* Push search bar down */
+        margin-bottom: 1rem; 
         align-self: center;
     }
 
     .img-unsplash img {
-        width: 60px; /* Slightly larger profile pic on mobile for easy tap */
+        width: 60px; 
         height: 60px;
     }
 
-    /* Stack cards in 1 column for robustness */
-    .today-highlights, .weekly-data, .air-quality-data {
+    .today-highlights, .weekly-data {
         grid-template-columns: 1fr; 
+    }
+    
+    .air-quality-data {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 10px;
     }
 
     .search {
@@ -880,7 +557,7 @@ footer .footer-div p {
     }
     
     .link-section {
-        flex-direction: column; /* Stack footer links on small phones */
+        flex-direction: column; 
         align-items: center;
         gap: 10px;
     }
@@ -890,4 +567,3 @@ footer .footer-div p {
         justify-content: center;
     }
 }
-
